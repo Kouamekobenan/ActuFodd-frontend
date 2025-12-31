@@ -5,13 +5,13 @@ export default function Home() {
     <main className="flex flex-col items-center justify-center min-h-screen text-center bg-gradient-to-br from-orange-20000 to-red-200 text-white p-4">
       <div className="flex flex-col items-center space-y-6">
         {/* Logo (facultatif) */}
-        <Image
+        {/* <Image
           src="/logo.png" 
           alt="ActuFood logo"
           width={120}
           height={120}
           className="rounded-full shadow-lg"
-        />
+        /> */}
 
         {/* Titre principal */}
         <h1 className="text-5xl font-extrabold">🍽️ ActuFood</h1>
