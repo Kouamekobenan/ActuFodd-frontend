@@ -26,13 +26,12 @@ export default function BarLaterale() {
     },
     { href: "/module/admin/posts", label: "Posts", icon: FileText },
     {
-      href: "/module/admin/dashboard/#",
+      href: "/module/admin/categories",
       label: "Catégories",
       icon: FolderOpen,
     },
     { href: "/module/auth/views/register", label: "Admins", icon: Users },
   ];
-
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
