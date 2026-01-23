@@ -54,13 +54,11 @@ export default function DetailPost() {
         <div className="container mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest hover:text-orange-600 transition-colors"
+            className="flex items-center gap-2 text-gray-900 text-[10px] md:text-xs font-black uppercase tracking-widest hover:text-orange-600 transition-colors"
           >
             <ChevronLeft size={14} /> Retour
           </button>
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <Share2 size={18} />
-          </button>
+         
         </div>
       </nav>
       {/* 2. Header de l'article */}
@@ -117,7 +115,7 @@ export default function DetailPost() {
 
           <div className="mt-10 p-6 md:p-8 bg-gray-50 rounded-2xl border-l-4 border-orange-500 italic font-serif text-gray-600 text-sm md:text-base">
             "La gastronomie est l'art d'utiliser la nourriture pour créer du
-            bonheur." — ActyFoody Team
+            bonheur." — ActuFoody Team
           </div>
         </div>
 

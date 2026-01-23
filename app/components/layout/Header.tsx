@@ -7,14 +7,14 @@ import { useAuth } from "../../context/AuthContext";
 import { Menu, X, LayoutDashboard } from "lucide-react"; // Utilisation de lucide-react pour des icônes propres
 
 const NAV_LINKS = [
-  { name: "Accueil", href: "/" },
-  { name: "Tendances", href: "/tendances" },
-  { name: "Portrait & rencontre", href: "/portrait" },
-  { name: "Recettes", href: "/recettes" },
-  { name: "Vidéos", href: "/videos" },
-  { name: "Restau In", href: "/restau" },
-  { name: "Agenda", href: "/agenda" },
-  { name: "Contact", href: "/contact" },
+  { name: "Accueil", href: "/page" },
+  { name: "Tendances", href: "/module/categories/views/page" },
+  { name: "Portrait & rencontre", href: "/page/#" },
+  { name: "Recettes", href: "/page/#" },
+  { name: "Vidéos", href: "/videos/#" },
+  { name: "Restau In", href: "/page/#" },
+  { name: "Agenda", href: "/page/#" },
+  { name: "Contact", href: "/page/#" },
 ];
 
 export default function Header() {

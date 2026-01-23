@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="space-y-4 sm:space-y-6">
             <a href="/" className="inline-block">
               <h2 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase">
-                Acty<span className="text-orange-600">Foody</span>
+                Actu<span className="text-orange-600">Foody</span>
               </h2>
             </a>
             <p className="text-gray-400 text-sm font-light leading-relaxed">
@@ -60,7 +60,6 @@ export default function Footer() {
               ))}
             </div>
           </div>
-
           {/* Navigation: Explorer */}
           <div>
             <h3 className="text-xs font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-orange-600 mb-6 sm:mb-8">

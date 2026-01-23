@@ -1,18 +1,18 @@
 import React from "react";
 import Image from "next/image";
-
+import Link from "next/link";
 export default function Presentation() {
   return (
     <section className="relative overflow-hidden bg-white py-16 lg:py-24">
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center gap-12 lg:flex-row">
           {/* Texte de présentation */}
-          <div className="flex-1 text-center lg:text-left">
+          <div className="flex-1 text-justify lg:text-left">
             <span className="mb-4 inline-block rounded-full bg-orange-100 px-4 py-1 text-sm font-semibold uppercase tracking-wider text-orange-600">
               L'univers culinaire
             </span>
             <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-gray-900 lg:text-7xl">
-              Acty<span className="text-orange-500">Foody</span>
+              Actu<span className="text-orange-500">Foody</span>
             </h1>
             <p className="mb-8 text-lg leading-relaxed text-gray-600 lg:text-xl">
               Plongez au cœur de l'essentiel de l'actualité gastronomique. Des
@@ -21,15 +21,16 @@ export default function Presentation() {
             </p>
 
             <div className="flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
-              <button className="rounded-lg bg-gray-900 px-8 py-3 font-semibold text-white transition-transform hover:scale-105 hover:bg-gray-800">
-                Découvrir les tendances
+            <Link href="/module/categories/views/page">
+             <button className="rounded-lg bg-gray-900 px-8 py-3 font-semibold text-white transition-transform hover:scale-105 hover:bg-gray-800">
+                Découvrir les tendances 
               </button>
+            </Link>
               <button className="rounded-lg border border-gray-300 px-8 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-50">
                 Nos recettes
               </button>
             </div>
           </div>
-
           {/* Image de présentation */}
           <div className="relative flex-1">
             <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl">

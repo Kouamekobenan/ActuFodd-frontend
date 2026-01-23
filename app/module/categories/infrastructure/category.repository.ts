@@ -28,4 +28,9 @@ export class CategoryRepository implements ICategoryRepository {
     const categories = await api.patch(url, dto);
     return categories.data;
   }
+  async findTendaces(): Promise<Category> {
+    const url = `/categories/tendance/cat`;
+    const categories = await api.get(url);
+    return categories.data.data;
+  }
 }
