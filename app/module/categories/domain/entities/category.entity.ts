@@ -1,9 +1,11 @@
+import { Post } from "../../../post/domain/entities/post";
+
 export class Category {
   constructor(
     public _id: string,
     public _name: string,
     public _description: string,
-    public _posts: any[] = [],
+    public _posts: Post[] = [],
     public _createdAt: Date,
     public _updatedAt: Date,
   ) {}
