@@ -58,7 +58,7 @@ export const metadata: Metadata = {
       "Découvrez les dernières tendances culinaires, plats du jour et restaurants incontournables en Côte d'Ivoire.",
     images: [
       {
-        url: "/og-image.jpg", // Assurez-vous d'avoir cette image dans /public
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "ActuFoody - Actualité culinaire",
@@ -72,8 +72,8 @@ export const metadata: Metadata = {
     title: "ActuFoody - Toute l'actualité culinaire en Côte d'Ivoire",
     description:
       "Découvrez les dernières tendances culinaires, plats du jour et restaurants incontournables.",
-    images: ["/twitter-image.jpg"], // Image optimisée pour Twitter
-    creator: "@actufoody", // Remplacez par votre handle Twitter
+    images: ["/twitter-image.jpg"],
+    creator: "@actufoody",
   },
 
   // Robots et indexation
@@ -96,21 +96,17 @@ export const metadata: Metadata = {
       { url: "/images/logo.jpeg", sizes: "16x16", type: "image/jpeg" },
       { url: "/images/logo.jpeg", sizes: "32x32", type: "image/jpeg" },
     ],
-    apple: [
-      { url: "/images/logo.jpeg", sizes: "180x180", type: "image/jpeg" },
-    ],
+    apple: [{ url: "/images/logo.jpeg", sizes: "180x180", type: "image/jpeg" }],
   },
   manifest: "/site.webmanifest",
 
   // Vérification
   verification: {
-    google: "votre-code-google-verification", // Ajoutez votre code Google Search Console
-    // yandex: "votre-code-yandex",
-    // bing: "votre-code-bing",
+    google: "votre-code-google-verification",
   },
 
   // Autres métadonnées
-  metadataBase: new URL("https://www.actufoody.com"), // Remplacez par votre URL de production
+  metadataBase: new URL("https://www.actufoody.com"),
   alternates: {
     canonical: "/",
     languages: {
@@ -128,7 +124,6 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
-        {/* Polices optimisées */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -139,13 +134,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        {/* SEO supplémentaire */}
-        <meta name="theme-color" content="#FF6B35" />{" "}
-        {/* Couleur de votre marque */}
+        <meta name="theme-color" content="#FF6B35" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        {/* Structured Data (JSON-LD) pour Google */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

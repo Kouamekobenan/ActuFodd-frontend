@@ -14,6 +14,8 @@ import { CreatePostDTO } from "../../post/application/dtos/create-post.dto";
 import { Category } from "../../categories/domain/entities/category.entity";
 import { CategoryRepository } from "../../categories/infrastructure/category.repository";
 import { FindAllCategoryUseCase } from "../../categories/application/usecases/findAll-category";
+import toast from "react-hot-toast";
+import { useAuth } from "../../../context/AuthContext";
 
 // Mock types and enums for demonstration
 enum MediaType {
@@ -22,10 +24,8 @@ enum MediaType {
   VIDEO = "VIDEO",
 }
 
-
 const catRepository = new CategoryRepository();
 const findAllCategoryUseCase = new FindAllCategoryUseCase(catRepository);
-
 
 interface CreatePostFormProps {
   onSubmitService: (data: CreatePostDTO, file: File | null) => Promise<void>;
@@ -34,8 +34,8 @@ interface CreatePostFormProps {
 export default function CreatePostForm({
   onSubmitService,
 }: CreatePostFormProps) {
-  const adminId = "demo-admin-id";
-
+  const { user } = useAuth();
+  const adminId = user?.id;
   const {
     register,
     handleSubmit,
@@ -60,27 +60,56 @@ export default function CreatePostForm({
 
   const watchMediaType = watch("mediaType");
 
-   const fetchCategories = async () => {
-     setLoadingCategories(true);
-     try {
-       const result = await findAllCategoryUseCase.execute();
-       setCategories(result);
-     } catch (error) {
-       console.error("Erreur lors de la récupération des catégories:", error);
-     } finally {
-       setLoadingCategories(false);
-     }
-   };
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      const result = await findAllCategoryUseCase.execute();
+      setCategories(result);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des catégories:", error);
+      toast.error("❌ Impossible de charger les catégories");
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
-    useEffect(() => {
-      fetchCategories();
-    }, []);
-
-
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+
+      // Validation de la taille du fichier (20 MB max)
+      const maxSize = 15 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.error(
+          `❌ Fichier trop volumineux (${(file.size / 1024 / 1024).toFixed(2)} MB). Maximum: 20 MB`,
+        );
+        e.target.value = ""; // Reset input
+        return;
+      }
+
+      // Validation du type de fichier
+      if (
+        watchMediaType === MediaType.IMAGE &&
+        !file.type.startsWith("image/")
+      ) {
+        toast.error("❌ Le fichier doit être une image");
+        e.target.value = "";
+        return;
+      }
+
+      if (
+        watchMediaType === MediaType.VIDEO &&
+        !file.type.startsWith("video/")
+      ) {
+        toast.error("❌ Le fichier doit être une vidéo");
+        e.target.value = "";
+        return;
+      }
+
       setSelectedFile(file);
 
       if (watchMediaType === MediaType.IMAGE) {
@@ -96,17 +125,145 @@ export default function CreatePostForm({
   };
 
   const onFormSubmit = async (data: CreatePostDTO) => {
+    // Validation côté client avant envoi
+    if (watchMediaType !== MediaType.TEXT && !selectedFile) {
+      toast.error("❌ Veuillez sélectionner un fichier");
+      return;
+    }
+
+    if (selectedFile) {
+      const maxSize = 15 * 1024 * 1024; // 20 MB
+      if (selectedFile.size > maxSize) {
+        toast.error(
+          `❌ Fichier trop volumineux (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB). Maximum: 20 MB`,
+        );
+        return;
+      }
+    }
+
     try {
       await onSubmitService(data, selectedFile);
-      alert("Post créé avec succès !");
+      toast.success("✅ Post créé avec succès !");
       reset();
       setSelectedFile(null);
       setPreviewUrl(null);
-    } catch (error) {
-      console.error(error);
-      alert("Erreur lors de la création du post.");
+    } catch (error: any) {
+      console.error("=== ERREUR LORS DE LA CRÉATION DU POST ===");
+      console.error("Error object:", error);
+      console.error("Response:", error.response);
+      console.error("Status:", error.response?.status);
+      console.error("Data:", error.response?.data);
+
+      // Gestion détaillée des erreurs
+      if (error.response) {
+        const statusCode = error.response.status;
+        const errorData = error.response.data;
+        let errorMessage =
+          errorData?.message || errorData?.error || "Une erreur est survenue";
+
+        // Si le message est un tableau (erreurs de validation multiples)
+        if (Array.isArray(errorMessage)) {
+          errorMessage.forEach((msg: string) => {
+            toast.error(`❌ ${msg}`);
+          });
+          return;
+        }
+
+        // Gestion selon le code d'erreur HTTP
+        switch (statusCode) {
+          case 400:
+            toast.error(
+              <div>
+                <div className="font-bold">❌ Données invalides</div>
+                <div className="text-sm mt-1">{errorMessage}</div>
+              </div>,
+              { duration: 5000 },
+            );
+            break;
+
+          case 413:
+            toast.error(
+              <div>
+                <div className="font-bold">❌ Fichier trop volumineux</div>
+                <div className="text-sm mt-1">
+                  Le fichier ne peut pas dépasser 20 MB
+                </div>
+              </div>,
+              { duration: 5000 },
+            );
+            break;
+
+          case 415:
+            toast.error(
+              <div>
+                <div className="font-bold">❌ Type de fichier non supporté</div>
+                <div className="text-sm mt-1">{errorMessage}</div>
+              </div>,
+              { duration: 5000 },
+            );
+            break;
+
+          case 401:
+            toast.error("❌ Non autorisé. Veuillez vous reconnecter.");
+            break;
+
+          case 403:
+            toast.error(
+              "❌ Accès refusé. Vous n'avez pas les permissions nécessaires.",
+            );
+            break;
+
+          case 404:
+            toast.error("❌ Ressource introuvable.");
+            break;
+
+          case 500:
+            toast.error(
+              <div>
+                <div className="font-bold">❌ Erreur serveur</div>
+                <div className="text-sm mt-1">
+                  Réessayez plus tard ou contactez le support
+                </div>
+              </div>,
+              { duration: 5000 },
+            );
+            break;
+
+          default:
+            toast.error(
+              <div>
+                <div className="font-bold">❌ Erreur {statusCode}</div>
+                <div className="text-sm mt-1">{errorMessage}</div>
+              </div>,
+              { duration: 5000 },
+            );
+        }
+      } else if (error.request) {
+        // Requête envoyée mais pas de réponse
+        toast.error(
+          <div>
+            <div className="font-bold">❌ Pas de réponse du serveur</div>
+            <div className="text-sm mt-1">
+              Vérifiez votre connexion internet
+            </div>
+          </div>,
+          { duration: 5000 },
+        );
+      } else {
+        // Erreur lors de la configuration de la requête
+        toast.error(
+          <div>
+            <div className="font-bold">❌ Erreur inattendue</div>
+            <div className="text-sm mt-1">
+              {error.message || "Une erreur est survenue"}
+            </div>
+          </div>,
+          { duration: 5000 },
+        );
+      }
     }
   };
+
   return (
     <div className="w-full">
       <form
@@ -147,7 +304,6 @@ export default function CreatePostForm({
               </p>
             )}
           </div>
-
           {/* Type de média */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
@@ -208,6 +364,8 @@ export default function CreatePostForm({
             <div className="space-y-3">
               <label className="block text-sm font-semibold text-gray-700">
                 Fichier {watchMediaType === MediaType.IMAGE ? "image" : "vidéo"}
+                <span className="text-red-500 ml-1">*</span>
+                <span className="text-xs text-gray-500 ml-2">(Max: 20 MB)</span>
               </label>
               <div className="relative border-2 border-dashed border-orange-300 rounded-xl p-4 sm:p-6 bg-gradient-to-br from-orange-50 to-pink-50 hover:border-orange-400 transition-all">
                 <input
@@ -227,6 +385,9 @@ export default function CreatePostForm({
                       </p>
                       <p className="text-xs text-gray-600 bg-white px-2 sm:px-3 py-1 rounded-full inline-block break-all max-w-full">
                         {selectedFile.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
                   ) : (
