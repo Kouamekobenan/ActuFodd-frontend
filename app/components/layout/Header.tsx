@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { name: "Vidéos", href: "/page/#" },
   { name: "Restau In", href: "/module/restau" },
   { name: "Agenda", href: "/module/agenda" },
-  { name: "Contact", href: "/page/#" },
+  { name: "Contact", href: "/module/contact" },
 ];
 
 export default function Header() {
