@@ -228,7 +228,7 @@ export default function PostAdmin() {
                       </svg>
                       <span className="truncate">Voir</span>
                     </Link>
-                    <Link
+                    {/* <Link
                       href={`/admin/posts/edit/${post.id}`}
                       className="flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 sm:p-2.5 rounded-lg sm:rounded-xl font-semibold transition-all flex-shrink-0"
                       title="Modifier"
@@ -246,7 +246,7 @@ export default function PostAdmin() {
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                         />
                       </svg>
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={() => setDeleteConfirm(post.id)}
                       className="flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 p-2 sm:p-2.5 rounded-lg sm:rounded-xl font-semibold transition-all flex-shrink-0"
@@ -337,8 +337,8 @@ export default function PostAdmin() {
                         </svg>
                         Voir
                       </Link>
-                      <Link
-                        href={`/admin/posts/edit/${post.id}`}
+                      {/* <Link
+                        href={`/module/admin/posts/edit/${post.id}`}
                         className="flex items-center gap-1.5 sm:gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all"
                       >
                         <svg
@@ -355,7 +355,7 @@ export default function PostAdmin() {
                           />
                         </svg>
                         Modifier
-                      </Link>
+                      </Link> */}
                       <button
                         onClick={() => setDeleteConfirm(post.id)}
                         className="flex items-center gap-1.5 sm:gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all"
