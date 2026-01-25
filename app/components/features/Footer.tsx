@@ -127,11 +127,11 @@ export default function Footer() {
         {/* Barre de Copyright */}
         <div className="pt-8 sm:pt-10 border-t border-gray-900 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 text-center md:text-left">
           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em]">
-            © {currentYear} ACTYFOODY — TOUS DROITS RÉSERVÉS.
+            © {currentYear} ACTUFOODY — TOUS DROITS RÉSERVÉS.
           </p>
           <div className="flex gap-4 sm:gap-6">
             <span className="text-[10px] text-gray-600 uppercase font-black">
-              Design by actyfody Team
+              Design by actufoody Team
             </span>
           </div>
         </div>

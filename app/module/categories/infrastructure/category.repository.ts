@@ -3,7 +3,6 @@ import { CreateCategoryDto } from "../application/dtos/create-dto";
 import { UpdateCategoryDto } from "../application/dtos/update-dto";
 import { Category } from "../domain/entities/category.entity";
 import { ICategoryRepository } from "../domain/interface/category.repository";
-
 export class CategoryRepository implements ICategoryRepository {
   async create(dto: CreateCategoryDto): Promise<Category> {
     const url = "/categories";
@@ -32,5 +31,25 @@ export class CategoryRepository implements ICategoryRepository {
     const url = `/categories/tendance/cat`;
     const categories = await api.get(url);
     return categories.data.data;
+  }
+  async findName(catName: string): Promise<Category> {
+    const url = `/categories/tendance/by-name?name=${encodeURIComponent(catName)}`;
+
+    try {
+      const response = await api.get(url);
+      const result = response.data.data || response.data;
+
+      if (!result) {
+        throw new Error("Aucune donnée reçue du serveur");
+      }
+
+      return result;
+    } catch (error: any) {
+      console.error(
+        "Erreur Repository FindName:",
+        error.response?.data || error.message,
+      );
+      throw error;
+    }
   }
 }

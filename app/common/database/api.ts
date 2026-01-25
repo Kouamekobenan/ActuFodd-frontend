@@ -10,7 +10,6 @@ export const api = axios.create({
   },
 });
 
-// 🔥 INTERCEPTEUR : Ajoute automatiquement le token à chaque requête
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {

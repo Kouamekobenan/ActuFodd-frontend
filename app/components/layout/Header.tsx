@@ -9,11 +9,11 @@ import { Menu, X, LayoutDashboard } from "lucide-react"; // Utilisation de lucid
 const NAV_LINKS = [
   { name: "Accueil", href: "/page" },
   { name: "Tendances", href: "/module/categories/views/page" },
-  { name: "Portrait & rencontre", href: "/page/#" },
-  { name: "Recettes", href: "/page/#" },
-  { name: "Vidéos", href: "/videos/#" },
-  { name: "Restau In", href: "/page/#" },
-  { name: "Agenda", href: "/page/#" },
+  { name: "Portrait & rencontre", href: "/module/portrait" },
+  { name: "Recettes", href: "/module/recette" },
+  { name: "Vidéos", href: "/page/#" },
+  { name: "Restau In", href: "/module/restau" },
+  { name: "Agenda", href: "/module/agenda" },
   { name: "Contact", href: "/page/#" },
 ];
 
