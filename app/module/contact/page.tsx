@@ -31,7 +31,7 @@ export default function ContactPage() {
               <p className="text-gray-500 text-lg max-w-2xl leading-relaxed">
                 Besoin d'un renseignement ou d'une étude personnalisée ? Notre
                 équipe d'experts vous accompagne dans chaque étape de votre
-                réservation.
+                projet.
               </p>
             </header>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">

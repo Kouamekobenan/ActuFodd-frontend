@@ -2,6 +2,7 @@ import { api } from "../../../common/database/api";
 import { IPaginatedResponse } from "../../../common/helpers/type-generique";
 import { CreatePostDTO } from "../application/dtos/create-post.dto";
 import { Post } from "../domain/entities/post";
+import { MediaType } from "../domain/enums/media-type";
 import { IPostRepository } from "../domain/interfaces/post.repository";
 export class PostRepository implements IPostRepository {
   async create(dto: CreatePostDTO, file?: File): Promise<Post> {
@@ -71,5 +72,24 @@ export class PostRepository implements IPostRepository {
   async delete(id: string): Promise<void> {
     const url = `/posts/${id}`;
     await api.delete(url);
+  }
+  async findType(
+    type: MediaType,
+    limit: number,
+    page: number,
+  ): Promise<IPaginatedResponse<Post>> {
+    const url = `/posts/type/${type}`;
+    const response = await api.get(url, {
+      params: { limit, page },
+    });
+    // Axios met le corps de la réponse dans .data
+    const result = response.data.data;
+    return {
+      data: Array.isArray(result) ? result : result.data || [],
+      total: result.total || 0,
+      totalPages: result.totalPages || 0,
+      limit: result.limit || limit,
+      page: result.page || page,
+    };
   }
 }

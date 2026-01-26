@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { name: "Tendances", href: "/module/categories/views/page" },
   { name: "Portrait & rencontre", href: "/module/portrait" },
   { name: "Recettes", href: "/module/recette" },
-  { name: "Vidéos", href: "/page/#" },
+  { name: "Vidéos", href: "/module/video" },
   { name: "Restau In", href: "/module/restau" },
   { name: "Agenda", href: "/module/agenda" },
   { name: "Contact", href: "/module/contact" },

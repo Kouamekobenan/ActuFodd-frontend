@@ -6,9 +6,11 @@ import { FindAllPostUseCase } from "../../module/post/application/usecases/findA
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "../../lib/global/global";
+import { FindPostByTypeUseCase } from "../../module/post/application/usecases/find-post-byType.usecase";
+import { MediaType } from "../../module/post/domain/enums/media-type";
 
 const postRepo = new PostRepository();
-const findAllPostUseCase = new FindAllPostUseCase(postRepo);
+const findAllPostUseCase = new FindPostByTypeUseCase(postRepo);
 
 const CATEGORIES = ["Tout", "Tendance", "Recettes", "Restaurant", "Portrait"];
 
@@ -18,7 +20,7 @@ export function Info() {
   const [activeCategory, setActiveCategory] = useState("Tout");
 
   const fetchPostData = useCallback(async () => {
-    const response = await findAllPostUseCase.execute(12, 1);
+    const response = await findAllPostUseCase.execute(MediaType.IMAGE, 12, 1);
     setPosts(response.data);
   }, []);
   useEffect(() => {
