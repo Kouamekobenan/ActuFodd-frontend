@@ -6,7 +6,6 @@ import {
   TrendingUp,
   Calendar,
   AlertCircle,
-  Loader2,
   ArrowRight,
 } from "lucide-react";
 
@@ -172,6 +171,10 @@ const ErrorState = ({
     >
       Réessayer
     </button>
+     <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+    <p className="text-xl text-gray-500">
+      Aucun contenu trouvé dans cette catégorie.
+    </p>
   </div>
 );
 
