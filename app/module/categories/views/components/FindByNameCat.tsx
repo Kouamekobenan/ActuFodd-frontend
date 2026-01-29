@@ -15,6 +15,7 @@ import { CategoryRepository } from "../../infrastructure/category.repository";
 import { FindCategoryByName } from "../../application/usecases/find-category-byName.usecase";
 import { Category } from "../../domain/entities/category.entity";
 import { formatDate } from "../../../../lib/global/global";
+import Link from "next/link";
 
 // Initialisation des services (Hors du composant pour éviter les re-créations inutiles)
 const categoryRepo = new CategoryRepository();
@@ -63,10 +64,13 @@ const PostCard = ({ post }: { post: any }) => {
         </p>
 
         <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-          <button className="text-orange-600 font-semibold text-sm inline-flex items-center group/btn">
-            Lire la suite
-            <ArrowRight className="w-4 h-4 ml-1 transform group-hover/btn:translate-x-1 transition-transform" />
-          </button>
+          <Link href={`/module/post/view/page/${post.id}`}>
+            {" "}
+            <button className="text-orange-600 font-semibold text-sm inline-flex items-center group/btn">
+              Lire la suite
+              <ArrowRight className="w-4 h-4 ml-1 transform group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </Link>
         </div>
       </div>
     </article>
@@ -117,7 +121,6 @@ export default function CategoryName({ catName }: { catName: string }) {
           )}
           <div className="w-20 h-1.5 bg-orange-600 mx-auto mt-6 rounded-full" />
         </header>
-
         {/* Zone de Contenu */}
         <div className="relative">
           {isLoading && (
