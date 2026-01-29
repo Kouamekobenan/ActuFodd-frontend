@@ -10,7 +10,6 @@ export default function PagePortrait() {
     <div className="">
       <Header />
       <main className="relative flex flex-col items-center justify-center min-h-screen overflow-x-hidden bg-white p-4 sm:p-8">
-       
         <CategoryName catName="Restaurants" />
       </main>
       <Footer />
