@@ -12,7 +12,13 @@ import { MediaType } from "../../module/post/domain/enums/media-type";
 const postRepo = new PostRepository();
 const findAllPostUseCase = new FindPostByTypeUseCase(postRepo);
 
-const CATEGORIES = ["Tout", "Tendance", "Recettes", "Restaurant", "Portrait"];
+const CATEGORIES = [
+  "Tout",
+  "Tendance",
+  "Recettes",
+  "Restaurant",
+  "Portrait & Rencontre",
+];
 
 export function Info() {
   const [posts, setPosts] = useState<Post[]>([]);

@@ -1,296 +1,456 @@
 "use client";
-import {useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   User,
   Mail,
   Lock,
   Eye,
   EyeOff,
-  CheckCircle,
-  AlertCircle,
   Loader2,
+  UserPlus,
+  X,
+  Trash2,
+  Search,
+  Users2,
+  AlertTriangle,
 } from "lucide-react";
-import Link from "next/link";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { RegisterDto } from "../../application/dtos/create-user.dto";
 import { UserRepository } from "../../infrastructure/user-repository";
 import { RegisterUserUseCase } from "../../application/usecases/create-use.usecase";
+import { User as Users } from "../../domain/user.entity";
+import { api } from "../../../../common/database/api";
+import { formatDate } from "../../../../lib/global/global";
 
-export default function RegisterForm() {
+const userRepo = new UserRepository();
+const createUserUseCase = new RegisterUserUseCase(userRepo);
+
+export default function AdminManagement() {
+  const [users, setUsers] = useState<Users[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<Users[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+
+  // États pour la suppression
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<Users | null>(null);
+
   const [formData, setFormData] = useState<RegisterDto>({
     email: "",
     password: "",
     name: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [loadingCities, setLoadingCities] = useState(true);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<
     Partial<Record<keyof RegisterDto, string>>
   >({});
 
-  // Instanciation du Repository et UseCase (Gardé pour la fonctionnalité)
-  const userRepo = new UserRepository();
-  const createUserUseCase = new RegisterUserUseCase(userRepo);
-  // Récupération des villes
+  // --- LOGIQUE DE SUPPRESSION ---
+  const openDeleteConfirm = (user: Users) => {
+    setUserToDelete(user);
+    setShowDeleteConfirm(true);
+  };
 
-  // Validation en temps réel (inchangée)
+  const closeDeleteConfirm = () => {
+    setShowDeleteConfirm(false);
+    setUserToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!userToDelete) return;
+
+    setDeletingUserId(userToDelete.id);
+    try {
+      await api.delete(`/users/${userToDelete.id}`);
+      // Mise à jour locale : filtrer l'utilisateur supprimé
+      setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+      toast.success(`${userToDelete.name} supprimé avec succès`);
+      closeDeleteConfirm();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Erreur lors de la suppression",
+      );
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
+  // --- LOGIQUE DE CRÉATION & VALIDATION ---
   const validateField = (name: keyof RegisterDto, value: string) => {
     let error = "";
-
     switch (name) {
       case "name":
-        if (value.trim().length < 3) {
-          error = "Le nom doit contenir au moins 3 caractères";
-        }
+        if (value.trim().length < 3) error = "Min. 3 caractères";
         break;
       case "email":
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-          error = "Email invalide";
-        }
+        if (!emailRegex.test(value)) error = "Email invalide";
         break;
       case "password":
-        if (value.length < 6) {
-          error = "Le mot de passe doit contenir au moins 6 caractères";
-        }
+        if (value.length < 6) error = "Min. 6 caractères";
         break;
     }
-
     setErrors((prev) => ({ ...prev, [name]: error }));
     return error === "";
   };
 
-  // Gestion des changements de champs (inchangée)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const fetchDataUser = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const response = await api.get("users");
+      setUsers(response.data.data);
+    } catch (error) {
+      toast.error("Erreur de chargement des administrateurs");
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataUser();
+  }, []);
+
+  useEffect(() => {
+    const filtered = users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    if (message) {
-      setMessage("");
-      setMessageType("");
-    }
     validateField(name as keyof RegisterDto, value);
   };
 
-  // Soumission du formulaire (inchangée)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
-    setMessageType("");
 
     const isNameValid = validateField("name", formData.name);
     const isEmailValid = validateField("email", formData.email);
     const isPasswordValid = validateField("password", formData.password);
 
     if (!isNameValid || !isEmailValid || !isPasswordValid) {
-      toast.error("Veuillez corriger les erreurs dans le formulaire.");
+      toast.error("Veuillez corriger les erreurs.");
       setLoading(false);
       return;
     }
-    try {
-      const dto: RegisterDto = {
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-        // refreshToken: formData.refreshToken,
-      };
-      const response = await createUserUseCase.execute(dto);
 
-      // ✅ Utiliser formData au lieu de user
-      toast.success(`Bienvenue ${formData.name} ! Votre compte est créé.`);
-      setMessageType("success");
-      setTimeout(() => {
-        setMessage(
-          `Bienvenue ${formData.name} ! Votre compte a été créé avec succès.`,
-        );
-        setFormData({
-          email: "",
-          password: "",
-          name: "",
-        });
-      }, 500);
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Une erreur est survenue lors de l'inscription";
-      toast.error(errorMessage);
-      setMessageType("error");
+    try {
+      await createUserUseCase.execute(formData);
+      toast.success("Administrateur créé avec succès !");
+      handleCloseModal();
+      fetchDataUser();
+    } catch (error: any) {
+      toast.error(error.message || "Erreur de création");
     } finally {
       setLoading(false);
     }
   };
-  // Classes de style (inchangées)
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({ email: "", password: "", name: "" });
+    setErrors({});
+    setShowPassword(false);
+  };
+
   const inputClass = (name: keyof RegisterDto) => `
-    w-full pl-11 pr-4 text-gray-800 py-3 border rounded-xl 
-    focus:ring-2 focus:ring-teal-500 focus:border-teal-500 
-    transition-all duration-300 ease-in-out
-    ${
-      errors[name]
-        ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-        : "border-gray-300 hover:border-teal-400"
-    }
+    w-full pl-11 pr-4 text-gray-800 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 
+    transition-all duration-300 ${errors[name] ? "border-red-500 bg-red-50" : "border-gray-300"}
   `;
-  const selectClass = (name: keyof RegisterDto) => `
-    w-full pl-11 text-gray-800 pr-10 py-3 border rounded-xl 
-    focus:ring-2 focus:ring-teal-500 focus:border-teal-500 
-    transition-all duration-300 ease-in-out appearance-none bg-white
-    ${
-      errors[name]
-        ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-        : "border-gray-300 hover:border-teal-400"
-    }
-    ${loadingCities ? "opacity-60 cursor-not-allowed" : ""}
-  `;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-100 to-purple-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      {/* Modification : Rendre le max-w plus petit sur mobile (sm:max-w-md -> max-w-xs ou sm:max-w-sm) */}
-      <div className="w-full max-w-sm sm:max-w-md">
-        {/* Conteneur principal (suppression du hover:scale pour le tactile) */}
-        <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8 transition-all duration-300 border border-gray-100">
-          {/* Header */}
-          <div className="text-center mb-4">        
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-1 bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-700">
-              Compte admin
-            </h1>
-            <p className="text-sm sm:text-base text-gray-500">
-              Créez votre compte administrateur en quelques secondes
-            </p>
-          </div>
-          {/* Formulaire : Réduction de l'espace vertical (space-y-3 au lieu de space-y-6) */}
-          <form onSubmit={handleSubmit} className="space-y-3">
-            {/* Nom complet */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nom complet
-              </label>
-              <User className="absolute left-3 top-[37px] w-5 h-5 text-gray-400 transition-colors" />
-              <input
-                type="text"
-                name="name"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={handleChange}
-                className={inputClass("name")}
-                required
-              />
-              {errors.name && (
-                <p className="mt-1 text-xs text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.name}
-                </p>
-              )}
+    <div className="min-h-screen bg-[#f8fafc] p-3 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 mb-6 border border-gray-100">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Users2 className="w-6 h-6 text-orange-600" />
+                Gestion Admins
+              </h1>
+              <p className="text-sm text-gray-500">
+                {users.length} administrateurs enregistrés
+              </p>
             </div>
-            {/* Email */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Adresse email
-              </label>
-              <Mail className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
-              <input
-                type="email"
-                name="email"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                className={inputClass("email")}
-                required
-              />
-              {errors.email && (
-                <p className="mt-1 text-xs text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.email}
-                </p>
-              )}
-            </div>
-            {/* Téléphone */}
-
-            {/* Mot de passe */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mot de passe
-              </label>
-              <Lock className="absolute left-3 top-[37px] w-5 h-5 text-gray-400" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                className={inputClass("password") + " pr-12"}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[37px] p-1 text-gray-500 hover:text-teal-600 transition-colors"
-                aria-label={
-                  showPassword
-                    ? "Masquer le mot de passe"
-                    : "Afficher le mot de passe"
-                }
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-600 flex items-center gap-1 animate-in fade-in slide-in-from-top-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.password}
-                </p>
-              )}
-            </div>
-            {/* Ville */}
-
-            {/* Bouton de soumission (Simplification du dégradé pour la clarté) */}
             <button
-              type="submit"
-              disabled={loading || loadingCities}
-              // Suppression du dégradé complexe, utilisation du teal-600 avec hover
-              className="w-full bg-orange-600 cursor-pointer text-white py-3 rounded-xl font-semibold text-base sm:text-lg
-                hover:bg-orange-700 focus:ring-4 focus:ring-orange-200 transition-all duration-300 
-                shadow-lg shadow-teal-300/50 hover:shadow-xl hover:shadow-teal-400/60
-                disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full lg:w-auto bg-orange-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-orange-700 transition-all shadow-md active:scale-95"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Création en cours...
-                </>
-              ) : (
-                "Créer mon compte"
-              )}
+              <UserPlus className="w-5 h-5" />
+              <span className="whitespace-nowrap">Nouvel Admin</span>
             </button>
-          </form>
-          {/* Message de retour */}
-          {message && (
-            <div
-              className={`mt-4 p-3 rounded-xl flex items-start gap-3 transition-all duration-500 animate-in fade-in slide-in-from-top-1 ${
-                messageType === "success"
-                  ? "bg-green-50 text-green-800 border-l-4 border-green-400"
-                  : "bg-red-50 text-red-800 border-l-4 border-red-400"
-              }`}
-            >
-              {messageType === "success" ? (
-                <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-green-500" />
-              ) : (
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500" />
-              )}
-              <p className="text-sm font-medium">{message}</p>
+          </div>
+
+          <div className="mt-6 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher par nom ou email..."
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {isLoadingUsers ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <Loader2 className="w-10 h-10 animate-spin text-orange-600 mb-2" />
+              <p>Chargement des données...</p>
             </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="text-center py-20 text-gray-400">
+              Aucun administrateur trouvé.
+            </div>
+          ) : (
+            <>
+              {/* VUE TABLEAU (Desktop) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-gray-50 text-gray-600 text-sm uppercase">
+                    <tr>
+                      <th className="px-6 py-4 font-bold tracking-wider">
+                        Nom
+                      </th>
+                      <th className="px-6 py-4 font-bold tracking-wider">
+                        Email
+                      </th>
+                      <th className="px-6 py-4 font-bold tracking-wider">
+                        Création
+                      </th>
+                      <th className="px-6 py-4 font-bold text-center tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredUsers.map((user) => (
+                      <tr
+                        key={user.id}
+                        className="hover:bg-orange-50/30 transition-colors group"
+                      >
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {user.name}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600">
+                          {user.email}
+                        </td>
+                        <td className="px-6 py-4 text-gray-500 text-sm">
+                          {user.createdAt ? formatDate(user.createdAt) : "--"}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => openDeleteConfirm(user)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* VUE LISTE (Mobile) */}
+              <div className="md:hidden divide-y divide-gray-100">
+                {filteredUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="p-4 flex items-center justify-between bg-white"
+                  >
+                    <div className="flex flex-col gap-1 min-w-0">
+                      <span className="font-bold text-gray-900 truncate">
+                        {user.name}
+                      </span>
+                      <span className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </span>
+                      <span className="text-[10px] text-gray-400 italic">
+                        Le {user.createdAt ? formatDate(user.createdAt) : "--"}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => openDeleteConfirm(user)}
+                      className="ml-4 p-3 text-red-600 bg-red-50 rounded-xl active:scale-90 transition-transform"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
+
+      {/* MODAL : CRÉATION */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-300">
+            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between z-10">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-orange-600" />
+                Nouvel Admin
+              </h2>
+              <button
+                onClick={handleCloseModal}
+                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">
+                  Nom complet
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="Ex: Jude Kouakou"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={inputClass("name")}
+                    required
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-red-500 text-[10px] ml-1">{errors.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">
+                  Email professionnel
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="admin@exemple.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={inputClass("email")}
+                    required
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-[10px] ml-1">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1 pb-4">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-1">
+                  Mot de passe
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={inputClass("password")}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-500 text-[10px] ml-1">
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-orange-600 text-white py-4 rounded-2xl font-bold hover:bg-orange-700 disabled:opacity-50 transition-all shadow-lg shadow-orange-100 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <Loader2 className="animate-spin w-5 h-5" />
+                ) : (
+                  "Confirmer la création"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL : CONFIRMATION SUPPRESSION */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[60] animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Supprimer l'admin ?
+              </h3>
+              <p className="text-gray-500 text-sm mb-6">
+                Voulez-vous vraiment retirer{" "}
+                <span className="font-bold text-gray-800">
+                  {userToDelete?.name}
+                </span>{" "}
+                ? Cette action est irréversible.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={closeDeleteConfirm}
+                  className="flex-1 px-4 py-3 border border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={!!deletingUserId}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all flex items-center justify-center gap-2"
+                >
+                  {deletingUserId ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Supprimer"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
