@@ -6,6 +6,7 @@ import { Category } from "../../domain/entities/category.entity";
 import Image from "next/image";
 import { formatDate } from "../../../../lib/global/global";
 import { TrendingUp, Calendar, AlertCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 const categoryRepo = new CategoryRepository();
 const categoryTendance = new FindCategoryTendanceUsecase(categoryRepo);
@@ -43,6 +44,16 @@ const PostCard = ({ post }: { post: any }) => {
             {formatDate(post.publishedAt)}
           </time>
         </div>
+        <Link
+          href={`/module/post/view/page/${post.id}`}
+          className="group inline-block p-2 bg-orange-100 mt-2 rounded-2xl"
+        >
+          <div className="flex items-center gap-4 text-white/70 text-xs font-bold uppercase tracking-widest">
+            <span className="text-orange-500 group-hover:pl-2 transition-all">
+              Lire le récit →
+            </span>
+          </div>
+        </Link>
       </div>
     </article>
   );
@@ -112,8 +123,6 @@ export default function CategoryTendance() {
 
     try {
       const result = await categoryTendance.execute();
-      console.log("Tendance category:", result);
-      // Vérifier si les données sont dans result.data ou directement dans result
       const categoryData = result;
       setTendance(categoryData);
     } catch (error) {
