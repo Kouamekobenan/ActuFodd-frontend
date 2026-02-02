@@ -5,7 +5,6 @@ import Image from "next/image";
 import {
   TrendingUp,
   Calendar,
-  AlertCircle,
   ArrowRight,
 } from "lucide-react";
 
@@ -152,7 +151,6 @@ export default function CategoryName({ catName }: { catName: string }) {
     </section>
   );
 }
-
 // Sous-composants restants avec un design affiné
 const ErrorState = ({
   message,
@@ -161,16 +159,7 @@ const ErrorState = ({
   message: string;
   onRetry: () => void;
 }) => (
-  <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-red-100">
-    <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-    <h3 className="text-2xl font-bold text-gray-900 mb-2">Oups !</h3>
-    <p className="text-gray-500 mb-8">{message}</p>
-    <button
-      onClick={onRetry}
-      className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-orange-600 transition-colors"
-    >
-      Réessayer
-    </button>
+  <div className="text-center py-20 px-6 bg-white rounded-3xl shadow-sm border border-red-100">
      <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
     <p className="text-xl text-gray-500">
       Aucun contenu trouvé dans cette catégorie.
