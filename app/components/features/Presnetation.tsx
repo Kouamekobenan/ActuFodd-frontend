@@ -11,9 +11,9 @@ const FULL_TEXT =
   "Né d'une passion pour les saveurs locales et une curiosité pour les tendances mondiales, actufoody.com raconte la nourriture comme on raconte une histoire — avec rigueur, respect et émotion. Nous donnons la parole aux cuisiniers de rue comme aux chefs étoilés, aux producteurs de fonio comme aux food-techs émergentes, aux chercheurs en nutrition comme aux activistes de la souveraineté alimentaire. Basé à Abidjan, actufoody.com s'adresse à une audience exigeante, curieuse et engagée en Côte d'Ivoire, en Afrique et dans la diaspora.";
 
 const STATS = [
-  { value: "500+", label: "Articles" },
-  { value: "12", label: "Catégories" },
-  { value: "CI & Africa", label: "Audience" },
+  { value: "10+", label: "Articles" },
+  { value: "5", label: "Catégories" },
+  { value: "Afrique & Moyen-Orient", label: "Audience" },
 ];
 
 export default function Presentation() {
@@ -54,7 +54,6 @@ export default function Presentation() {
               <p className="text-base md:text-lg leading-relaxed text-gray-600">
                 {EXCERPT}
               </p>
-
               {/* Expanded text */}
               <div
                 className={`overflow-hidden transition-all duration-500 ease-in-out ${
@@ -83,7 +82,6 @@ export default function Presentation() {
                 )}
               </button>
             </div>
-
             {/* Stats row */}
             <div className="mb-8 flex items-center gap-6 md:gap-8 py-5 border-y border-gray-100">
               {STATS.map((s, i) => (
@@ -95,7 +93,6 @@ export default function Presentation() {
                 </div>
               ))}
             </div>
-
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/module/categories/views/page">
@@ -111,7 +108,6 @@ export default function Presentation() {
               </Link>
             </div>
           </div>
-
           {/* ── Right: Image ── */}
           <div className="relative">
             {/* Decorative background square */}
@@ -137,11 +133,11 @@ export default function Presentation() {
                   <p className="text-[10px] uppercase tracking-widest text-orange-600 font-black mb-0.5">
                     Média culinaire
                   </p>
-                  <p className="text-sm font-bold text-gray-900">Basé à Abidjan 🇨🇮</p>
+                  <p className="text-sm font-bold text-gray-900">Basé en Afrique & Moyen-Orient</p>
                 </div>
                 <div className="bg-orange-600 rounded-2xl px-4 py-3 shadow-lg text-center">
                   <p className="text-xs font-black text-white/80 uppercase tracking-wide">Depuis</p>
-                  <p className="text-lg font-black text-white leading-none">2024</p>
+                  <p className="text-lg font-black text-white leading-none">2025</p>
                 </div>
               </div>
             </div>

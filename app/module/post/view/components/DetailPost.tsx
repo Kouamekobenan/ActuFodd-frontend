@@ -312,18 +312,36 @@ export default function DetailPost() {
       <article className="container mx-auto max-w-3xl px-4 md:px-6 pb-12">
         {post.content && (
           <div className="prose prose-orange max-w-none mb-10">
-            <p
-              className="text-lg md:text-2xl font-serif leading-relaxed text-gray-800
-              first-letter:text-5xl md:first-letter:text-7xl
-              first-letter:font-black first-letter:text-orange-600
-              first-letter:mr-2 md:first-letter:mr-3
-              first-letter:float-left first-letter:leading-none"
-            >
-              {post.content}
-            </p>
+            <style>{`
+              .article-body h1 { font-size: 1.9rem; font-weight: 800; margin: 1.5rem 0 0.75rem; color: #111827; line-height: 1.15; }
+              .article-body h2 { font-size: 1.45rem; font-weight: 700; margin: 1.25rem 0 0.6rem; color: #1f2937; }
+              .article-body h3 { font-size: 1.15rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #374151; }
+              .article-body p  { font-size: 1.125rem; line-height: 1.9; color: #374151; margin: 0.85rem 0; font-family: Georgia, serif; }
+              .article-body p:first-child::first-letter {
+                font-size: 3.5rem; font-weight: 800; float: left; line-height: 0.8;
+                margin-right: 0.15rem; margin-top: 0.1rem; color: #ea580c; font-family: Georgia, serif;
+              }
+              .article-body strong { font-weight: 700; color: #111827; }
+              .article-body em { font-style: italic; color: #4b5563; }
+              .article-body u { text-decoration: underline; text-decoration-color: #fdba74; text-underline-offset: 3px; }
+              .article-body s { text-decoration: line-through; color: #9ca3af; }
+              .article-body ul { list-style: disc; padding-left: 1.5rem; margin: 0.75rem 0; }
+              .article-body ol { list-style: decimal; padding-left: 1.5rem; margin: 0.75rem 0; }
+              .article-body li { font-size: 1.05rem; line-height: 1.75; color: #374151; margin: 0.3rem 0; font-family: Georgia, serif; }
+              .article-body blockquote {
+                border-left: 4px solid #f97316; padding: 0.75rem 1.25rem;
+                margin: 1.25rem 0; background: #fff7ed; border-radius: 0 0.75rem 0.75rem 0;
+                font-style: italic; color: #92400e; font-size: 1.1rem; font-family: Georgia, serif;
+              }
+              .article-body a { color: #ea580c; text-decoration: underline; font-weight: 600; }
+              .article-body a:hover { color: #c2410c; }
+            `}</style>
+            <div
+              className="article-body"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
           </div>
         )}
-
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
           <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-2">

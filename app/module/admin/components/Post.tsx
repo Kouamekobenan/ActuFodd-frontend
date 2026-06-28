@@ -16,6 +16,8 @@ import { Category } from "../../categories/domain/entities/category.entity";
 import { TagRepository } from "../../post/infrastructure/tag.repository";
 import { SetPostTagsUseCase } from "../../post/application/usecases/set-post-tags.usecase";
 import { formatDate } from "../../../lib/global/global";
+import RichTextEditor from "./RichTextEditor";
+import SelectDropdown from "./SelectDropdown";
 
 const postRepo = new PostRepository();
 const catRepo = new CategoryRepository();
@@ -221,30 +223,23 @@ function EditModal({ post, categories, onClose, onSaved }: EditModalProps) {
           {/* Contenu */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Contenu</label>
-            <textarea
-              value={form.content}
-              onChange={(e) => setForm({ ...form, content: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl text-black focus:border-orange-500 focus:ring-4 focus:ring-orange-100 outline-none resize-none text-sm"
-              placeholder="Contenu du post..."
+            <RichTextEditor
+              value={form.content ?? ""}
+              onChange={(html) => setForm({ ...form, content: html })}
+              placeholder="Contenu du post…"
+              minHeight="180px"
             />
           </div>
 
           {/* Catégorie */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Catégorie</label>
-            <select
-              value={form.categoryId}
-              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl text-black focus:border-orange-500 focus:ring-4 focus:ring-orange-100 outline-none text-sm appearance-none"
-            >
-              <option value="">— Aucune catégorie —</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <SelectDropdown
+              options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+              value={form.categoryId ?? ""}
+              onChange={(val) => setForm({ ...form, categoryId: val })}
+              placeholder="— Aucune catégorie —"
+            />
           </div>
 
           {/* Tags */}
@@ -458,7 +453,7 @@ export default function PostAdmin() {
               </div>
 
               <Link
-                href="/module/admin/posts"
+                href="/module/admin/posts/new"
                 className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:scale-105 transition-all whitespace-nowrap"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

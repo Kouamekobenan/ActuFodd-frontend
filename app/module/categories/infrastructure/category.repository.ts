@@ -4,20 +4,31 @@ import { UpdateCategoryDto } from "../application/dtos/update-dto";
 import { Category } from "../domain/entities/category.entity";
 import { ICategoryRepository } from "../domain/interface/category.repository";
 
+function mapCategory(raw: any): Category {
+  return new Category(
+    raw.id ?? raw._id ?? "",
+    raw.name ?? raw._name ?? "",
+    raw.description ?? raw._description ?? "",
+    raw.createdAt ?? raw._createdAt ?? "",
+    raw.updatedAt ?? raw._updatedAt ?? "",
+  );
+}
+
 export class CategoryRepository implements ICategoryRepository {
   async create(dto: CreateCategoryDto): Promise<Category> {
     const res = await api.post("/categories", dto);
-    return res.data.data;
+    return mapCategory(res.data.data);
   }
 
   async findAll(): Promise<Category[]> {
     const res = await api.get("/categories");
-    return res.data.data;
+    const data: any[] = res.data.data ?? [];
+    return data.map(mapCategory);
   }
 
   async findOne(id: string): Promise<Category> {
     const res = await api.get(`/categories/${id}`);
-    return res.data.data;
+    return mapCategory(res.data.data);
   }
 
   async delete(id: string): Promise<void> {
@@ -26,6 +37,6 @@ export class CategoryRepository implements ICategoryRepository {
 
   async update(id: string, dto: UpdateCategoryDto): Promise<Category> {
     const res = await api.patch(`/categories/${id}`, dto);
-    return res.data.data;
+    return mapCategory(res.data.data);
   }
 }

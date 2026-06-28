@@ -18,10 +18,12 @@ import { Category } from "../../categories/domain/entities/category.entity";
 import { CategoryRepository } from "../../categories/infrastructure/category.repository";
 import { FindAllCategoryUseCase } from "../../categories/application/usecases/findAll-category";
 import { TagRepository } from "../../post/infrastructure/tag.repository";
+import SelectDropdown from "./SelectDropdown";
 import { SetPostTagsUseCase } from "../../post/application/usecases/set-post-tags.usecase";
 import { Post } from "../../post/domain/entities/post";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/AuthContext";
+import RichTextEditor from "./RichTextEditor";
 
 enum MediaType {
   TEXT = "TEXT",
@@ -46,6 +48,7 @@ export default function CreatePostForm({ onSubmitService }: CreatePostFormProps)
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CreatePostDTO>({
     defaultValues: {
@@ -318,11 +321,10 @@ export default function CreatePostForm({ onSubmitService }: CreatePostFormProps)
           {/* Contenu */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">Contenu du post</label>
-            <textarea
-              {...register("content")}
-              rows={5}
-              className="w-full text-black px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl transition-all outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-100 resize-none text-sm sm:text-base"
-              placeholder="Écrivez votre contenu ici..."
+            <RichTextEditor
+              value={watch("content") ?? ""}
+              onChange={(html) => setValue("content", html, { shouldDirty: true })}
+              placeholder="Écrivez votre contenu ici…"
             />
           </div>
 
@@ -332,24 +334,18 @@ export default function CreatePostForm({ onSubmitService }: CreatePostFormProps)
               <MapPin className="w-4 h-4 text-orange-600" />
               Catégorie <span className="text-red-500">*</span>
             </label>
-            <select
+            <input
+              type="hidden"
               {...register("categoryId", { required: "Veuillez sélectionner une catégorie" })}
+            />
+            <SelectDropdown
+              options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+              value={watch("categoryId") ?? ""}
+              onChange={(val) => setValue("categoryId", val, { shouldValidate: true })}
+              placeholder={loadingCategories ? "Chargement..." : "Sélectionnez une catégorie"}
               disabled={loadingCategories}
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border-2 text-black rounded-xl transition-all outline-none appearance-none cursor-pointer text-sm sm:text-base ${
-                errors.categoryId
-                  ? "border-red-500 bg-red-50"
-                  : "border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100"
-              }`}
-            >
-              <option value="">
-                {loadingCategories ? "Chargement..." : "Sélectionnez une catégorie"}
-              </option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              error={!!errors.categoryId}
+            />
             {errors.categoryId && (
               <p className="text-red-500 text-xs sm:text-sm font-medium flex items-center gap-1">
                 <span className="text-lg">⚠</span> {errors.categoryId.message}
