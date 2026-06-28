@@ -8,4 +8,5 @@ export interface CreatePostDTO {
   categoryId: string;
   adminId: string;
   isPublished?: boolean;
+  sourceUrl?: string;
 }

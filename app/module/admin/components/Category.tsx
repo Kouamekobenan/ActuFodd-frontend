@@ -8,7 +8,6 @@ import {
   Save,
   Search,
   FolderOpen,
-  Calendar,
   AlertCircle,
 } from "lucide-react";
 import { Category } from "../../categories/domain/entities/category.entity";
@@ -19,28 +18,22 @@ import { CreateCategoryDto } from "../../categories/application/dtos/create-dto"
 import { UpdateCategoryUseCase } from "../../categories/application/usecases/update-category.usecase";
 import { DeleteCategoryUseCase } from "../../categories/application/usecases/delete-category.usecase";
 
-// Mock types for demonstration
 const cateRepo = new CategoryRepository();
 const findAllCategoryUseCase = new FindAllCategoryUseCase(cateRepo);
-const createCategoryUseCase = new CreateCategoryUseCase(cateRepo); 
+const createCategoryUseCase = new CreateCategoryUseCase(cateRepo);
 const updateCategoryUseCase = new UpdateCategoryUseCase(cateRepo);
 const deleteCategoryUseCase = new DeleteCategoryUseCase(cateRepo);
+
 export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null,
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [formData, setFormData] = useState<CreateCategoryDto>({
-    name: "",
-    description: "",
-  });
+  const [formData, setFormData] = useState<CreateCategoryDto>({ name: "" });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
-    null,
-  );
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+
   const fetchCategories = async () => {
     try {
       const cats = await findAllCategoryUseCase.execute();
@@ -49,58 +42,45 @@ export default function AdminCategories() {
       console.error("Erreur lors de la récupération des catégories :", error);
     }
   };
+
   useEffect(() => {
     fetchCategories();
   }, []);
-  // Filtered categories based on search
-  const filteredCategories = categories.filter(
-    (cat) =>
-      cat._name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      cat._description.toLowerCase().includes(searchQuery.toLowerCase()),
+
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const openCreateModal = () => {
     setModalMode("create");
-    setFormData({ name: "", description: "" });
+    setFormData({ name: "" });
     setIsModalOpen(true);
   };
 
   const openEditModal = (category: Category) => {
     setModalMode("edit");
     setSelectedCategory(category);
-    setFormData({
-      name: category._name,
-      description: category._description,
-    });
+    setFormData({ name: category.name });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedCategory(null);
-    setFormData({ name: "", description: "" });
+    setFormData({ name: "" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (modalMode === "create") {
-      // Simulate create
-     await createCategoryUseCase.execute(formData);
-      setCategories([...categories]);
+      await createCategoryUseCase.execute(formData);
+      await fetchCategories();
     } else {
-      // Simulate update
       if (!selectedCategory) return;
-      await updateCategoryUseCase.execute(selectedCategory._id, formData);
-      setCategories(
-        categories.map((cat) =>
-          cat._id === selectedCategory?._id
-            ? {
-                ...cat,
-                _name: formData.name,
-                _description: formData.description,
-              }
-            : cat,
+      await updateCategoryUseCase.execute(selectedCategory.id, formData);
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === selectedCategory.id ? { ...cat, name: formData.name } : cat,
         ),
       );
     }
@@ -113,15 +93,11 @@ export default function AdminCategories() {
   };
 
   const confirmDelete = async () => {
-    if (categoryToDelete) {
-      // Simulate delete
-      await deleteCategoryUseCase.execute(categoryToDelete._id);
-      setCategories(
-        categories.filter((cat) => cat._id !== categoryToDelete._id),
-      );
-      setIsDeleteModalOpen(false);
-      setCategoryToDelete(null);
-    }
+    if (!categoryToDelete) return;
+    await deleteCategoryUseCase.execute(categoryToDelete.id);
+    setCategories((prev) => prev.filter((cat) => cat.id !== categoryToDelete.id));
+    setIsDeleteModalOpen(false);
+    setCategoryToDelete(null);
   };
 
   return (
@@ -136,8 +112,7 @@ export default function AdminCategories() {
                 Gestion des Catégories
               </h1>
               <p className="text-sm text-gray-600 mt-1">
-                {categories.length} catégorie{categories.length > 1 ? "s" : ""}{" "}
-                au total
+                {categories.length} catégorie{categories.length > 1 ? "s" : ""} au total
               </p>
             </div>
             <button
@@ -149,7 +124,7 @@ export default function AdminCategories() {
             </button>
           </div>
 
-          {/* Search Bar */}
+          {/* Search */}
           <div className="mt-4 sm:mt-6 relative">
             <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             <input
@@ -161,6 +136,7 @@ export default function AdminCategories() {
             />
           </div>
         </div>
+
         {/* Categories Grid */}
         {filteredCategories.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
@@ -187,14 +163,14 @@ export default function AdminCategories() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredCategories.map((category) => (
               <div
-                key={category._id}
+                key={category.id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100"
               >
                 <div className="bg-orange-500 h-2"></div>
                 <div className="p-4 sm:p-6">
                   <div className="flex items-start justify-between mb-3">
                     <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex-1 break-words">
-                      {category._name}
+                      {category.name}
                     </h2>
                     <div className="flex gap-1 sm:gap-2 ml-2">
                       <button
@@ -213,43 +189,26 @@ export default function AdminCategories() {
                       </button>
                     </div>
                   </div>
-                  <p className="text-sm sm:text-base text-gray-600 mb-4 line-clamp-2">
-                    {category._description}
-                  </p>
-                  {category._createdAt && (
-                    <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg w-fit">
-                      <Calendar className="w-3 h-3" />
-                      Créée le{" "}
-                      {new Date(category._createdAt).toLocaleDateString(
-                        "fr-FR",
-                      )}
-                    </div>
-                  )}
+                  <p className="text-xs text-gray-400 font-mono break-all">{category.id}</p>
                 </div>
               </div>
             ))}
           </div>
         )}
-        {/* Create/Edit Modal */}
+
+        {/* Create / Edit Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header */}
               <div className="bg-gray-600 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between rounded-t-2xl">
                 <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                   {modalMode === "create" ? (
-                    <>
-                      <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
-                      Nouvelle Catégorie
-                    </>
+                    <><Plus className="w-5 h-5 sm:w-6 sm:h-6" /> Nouvelle Catégorie</>
                   ) : (
-                    <>
-                      <Edit className="w-5 h-5 sm:w-6 sm:h-6" />
-                      Modifier la Catégorie
-                    </>
+                    <><Edit className="w-5 h-5 sm:w-6 sm:h-6" /> Modifier la Catégorie</>
                   )}
                 </h3>
                 <button
@@ -259,11 +218,8 @@ export default function AdminCategories() {
                   <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
-              {/* Modal Body */}
-              <form
-                onSubmit={handleSubmit}
-                className="p-4 sm:p-6 space-y-4 sm:space-y-5"
-              >
+
+              <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
                     Nom de la catégorie <span className="text-red-500">*</span>
@@ -271,30 +227,13 @@ export default function AdminCategories() {
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ name: e.target.value })}
                     required
                     className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 text-black focus:ring-orange-100 outline-none transition-all text-sm sm:text-base"
-                    placeholder="Ex: Technologie, Sport, Actualités..."
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    rows={4}
-                    className="w-full px-3 sm:px-4 text-black py-2 sm:py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 outline-none transition-all resize-none text-sm sm:text-base"
-                    placeholder="Décrivez cette catégorie..."
+                    placeholder="Ex: Restauration rapide, Fast-food..."
                   />
                 </div>
 
-                {/* Modal Actions */}
                 <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2 sm:pt-4">
                   <button
                     type="button"
@@ -315,14 +254,14 @@ export default function AdminCategories() {
             </div>
           </div>
         )}
+
         {/* Delete Confirmation Modal */}
         {isDeleteModalOpen && categoryToDelete && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header */}
               <div className="bg-gray-600 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between rounded-t-2xl">
                 <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -336,22 +275,17 @@ export default function AdminCategories() {
                 </button>
               </div>
 
-              {/* Modal Body */}
               <div className="p-4 sm:p-6">
                 <div className="bg-red-50 border-2 border-red-200 rounded-xl p-3 sm:p-4 mb-4 sm:mb-5">
                   <p className="text-sm sm:text-base text-gray-700">
                     Êtes-vous sûr de vouloir supprimer la catégorie{" "}
-                    <span className="font-bold text-red-700">
-                      "{categoryToDelete._name}"
-                    </span>{" "}
-                    ?
+                    <span className="font-bold text-red-700">"{categoryToDelete.name}"</span> ?
                   </p>
                   <p className="text-xs sm:text-sm text-gray-600 mt-2">
                     Cette action est irréversible.
                   </p>
                 </div>
 
-                {/* Modal Actions */}
                 <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
                   <button
                     onClick={() => setIsDeleteModalOpen(false)}

@@ -1,95 +1,100 @@
 import { api } from "../../../common/database/api";
 import { IPaginatedResponse } from "../../../common/helpers/type-generique";
 import { CreatePostDTO } from "../application/dtos/create-post.dto";
+import { UpdatePostDTO } from "../application/dtos/update-post.dto";
 import { Post } from "../domain/entities/post";
 import { MediaType } from "../domain/enums/media-type";
 import { IPostRepository } from "../domain/interfaces/post.repository";
+
 export class PostRepository implements IPostRepository {
+  async findAll(limit: number, page: number): Promise<IPaginatedResponse<Post>> {
+    const res = await api.get("/posts", { params: { limit, page } });
+    const result = res.data.data;
+    return {
+      data: result.data ?? [],
+      total: result.total ?? 0,
+      totalPages: result.totalPages ?? 0,
+      limit: result.limit ?? limit,
+      page: result.page ?? page,
+    };
+  }
+
+  async findType(type: MediaType, limit: number, page: number): Promise<IPaginatedResponse<Post>> {
+    const res = await api.get(`/posts/type/${type}`, { params: { limit, page } });
+    const result = res.data.data;
+    return {
+      data: result.data ?? [],
+      total: result.total ?? 0,
+      totalPages: result.totalPages ?? 0,
+      limit: result.limit ?? limit,
+      page: result.page ?? page,
+    };
+  }
+
+  async search(q: string, page: number, limit: number): Promise<IPaginatedResponse<Post>> {
+    const res = await api.get("/posts/search", { params: { q, page, limit } });
+    const result = res.data.data;
+    return {
+      data: result.data ?? [],
+      total: result.total ?? 0,
+      totalPages: result.totalPages ?? 0,
+      limit: result.limit ?? limit,
+      page: result.page ?? page,
+    };
+  }
+
+  async trending(limit: number): Promise<Post[]> {
+    const res = await api.get("/posts/trending", { params: { limit } });
+    return res.data.data ?? [];
+  }
+
+  async findOne(id: string): Promise<Post> {
+    const res = await api.get(`/posts/${id}`);
+    return res.data.data;
+  }
+
   async create(dto: CreatePostDTO, file?: File): Promise<Post> {
-    let response;
-    const url = `/posts`;
     try {
-      if (file) {
-        const formData = new FormData();
-        formData.append("mediaUrl", file);
-        // 2. Ajouter les autres champs du DTO
-        formData.append("title", dto.title);
-        formData.append("content", dto.content);
-        formData.append("mediaType", dto.mediaType);
-        formData.append("categoryId", dto.categoryId);
-        formData.append("isPublished", (dto.isPublished ?? false).toString());
-        // Si le backend nécessite adminId même si optional
-        if (dto.adminId) {
-          formData.append("adminId", dto.adminId);
-        }
-        // 3. Envoyer FormData (l'en-tête 'Content-Type: multipart/form-data' est souvent auto-géré)
-        response = await api.post(url, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } else {
-        // const productPayload = this.mapper.toApp(dto);
-
-        response = await api.post(url, dto);
-      }
-
-      return response.data.data;
+      const formData = new FormData();
+      formData.append("title", dto.title);
+      if (dto.content) formData.append("content", dto.content);
+      formData.append("mediaType", dto.mediaType);
+      if (dto.categoryId) formData.append("categoryId", dto.categoryId);
+      formData.append("isPublished", (dto.isPublished ?? false).toString());
+      if (file) formData.append("mediaUrl", file);
+      const res = await api.post("/posts", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data.data;
     } catch (error: any) {
-      console.error(
-        "Erreur Infrastructure (Repository) lors de la création du post:",
-        error,
-      );
-      // Rejeter une erreur compréhensible par la couche Application/Domaine
-      const message =
-        error?.response?.data?.message ||
-        "Erreur de connexion à l'API lors de la création.";
-      throw new Error(message);
+      throw new Error(error?.response?.data?.message ?? "Erreur lors de la création.");
     }
   }
-  async findAll(
-    limit: number,
-    page: number,
-  ): Promise<IPaginatedResponse<Post>> {
-    const url = "/posts";
-    // Appel API
-    const response = await api.get(url, {
-      params: { limit, page },
-    });
-    // Axios met le corps de la réponse dans .data
-    const result = response.data.data;
-    return {
-      data: Array.isArray(result) ? result : result.data || [],
-      total: result.total || 0,
-      totalPages: result.totalPages || 0,
-      limit: result.limit || limit,
-      page: result.page || page,
-    };
+
+  async update(id: string, dto: UpdatePostDTO, file?: File): Promise<Post> {
+    try {
+      const formData = new FormData();
+      if (dto.title !== undefined) formData.append("title", dto.title);
+      if (dto.content !== undefined) formData.append("content", dto.content);
+      if (dto.mediaType !== undefined) formData.append("mediaType", dto.mediaType);
+      if (dto.categoryId !== undefined) formData.append("categoryId", dto.categoryId);
+      if (dto.isPublished !== undefined) formData.append("isPublished", dto.isPublished.toString());
+      if (file) formData.append("mediaUrl", file);
+      const res = await api.patch(`/posts/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return res.data.data;
+    } catch (error: any) {
+      throw new Error(error?.response?.data?.message ?? "Erreur lors de la mise à jour.");
+    }
   }
-  async findOne(id: string): Promise<Post> {
-    const url = `/posts/${id}`;
-    const post = await api.get(url);
-    return post.data.data;
+
+  async publish(id: string, isPublished: boolean): Promise<Post> {
+    const res = await api.patch(`/posts/${id}/publish`, { isPublished });
+    return res.data.data;
   }
+
   async delete(id: string): Promise<void> {
-    const url = `/posts/${id}`;
-    await api.delete(url);
-  }
-  async findType(
-    type: MediaType,
-    limit: number,
-    page: number,
-  ): Promise<IPaginatedResponse<Post>> {
-    const url = `/posts/type/${type}`;
-    const response = await api.get(url, {
-      params: { limit, page },
-    });
-    // Axios met le corps de la réponse dans .data
-    const result = response.data.data;
-    return {
-      data: Array.isArray(result) ? result : result.data || [],
-      total: result.total || 0,
-      totalPages: result.totalPages || 0,
-      limit: result.limit || limit,
-      page: result.page || page,
-    };
+    await api.delete(`/posts/${id}`);
   }
 }

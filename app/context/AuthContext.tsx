@@ -7,17 +7,15 @@ import React, {
   useRef,
 } from "react";
 import { api } from "../common/database/api";
-import { User } from "../module/auth/domain/user.entity";
+import { User, UserRole } from "../module/auth/domain/user.entity";
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  login: (
-    email: string,
-    password: string,
-  ) => Promise<{ user: User; accessToken: string }>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<{ user: User; accessToken: string }>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -29,11 +27,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const isMounted = useRef(true);
 
-  // Helper pour sauvegarder le token
-  const saveToken = (accessToken: string, userId?: string) => {
+  const saveTokens = (accessToken: string, refreshToken: string) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("access_token", accessToken);
-      if (userId) localStorage.setItem("user_id", userId);
+      localStorage.setItem("refresh_token", refreshToken);
+    }
+  };
+
+  const clearTokens = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
     }
   };
 
@@ -41,47 +45,48 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     password: string,
   ): Promise<{ user: User; accessToken: string }> => {
-    try {
-      const res = await api.post(`/auth/login`, { email, password });
-      console.log("📦 Réponse complète du backend:", res.data);
+    const res = await api.post("/auth/login", { email, password });
+    const { user: userData, access_token, refresh_token } = res.data.data;
 
-      // ✅ Extraction depuis res.data.data
-      const userData = res.data.data.user;
-      const accessToken = res.data.data.token.access_token;
-
-      console.log("👤 User extrait:", userData);
-      console.log("🔑 Access Token extrait:", accessToken);
-
-      // Vérification de sécurité
-      if (!accessToken || !userData) {
-        console.error("❌ Token ou user manquants dans la réponse!");
-        throw new Error("Réponse de connexion invalide du serveur");
-      }
-
-      // Sauvegarde locale
-      saveToken(accessToken, userData.id);
-
-      // Mise à jour du contexte global
-      setUser(userData);
-      setIsAuthenticated(true);
-
-      // Retourne les données au frontend
-      return {
-        user: userData,
-        accessToken: accessToken,
-      };
-    } catch (error: any) {
-      console.error("❌ Erreur lors du login:", error);
-      console.error("❌ Réponse d'erreur:", error.response?.data);
-      throw new Error(error.response?.data?.message || "Erreur de connexion");
+    if (!access_token || !userData) {
+      throw new Error("Réponse de connexion invalide du serveur");
     }
+
+    saveTokens(access_token, refresh_token);
+    setUser(userData);
+    setIsAuthenticated(true);
+
+    return { user: userData, accessToken: access_token };
   };
 
-  const logout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("user_id");
+  const register = async (name: string, email: string, password: string) => {
+    const res = await api.post("/auth/register", { name, email, password });
+    const { access_token, refresh_token } = res.data.data;
+
+    if (!access_token) {
+      throw new Error("Réponse d'inscription invalide du serveur");
     }
+
+    saveTokens(access_token, refresh_token);
+    // fetch user profile after registration
+    const meRes = await api.get("/auth/me");
+    const userData: User = meRes.data.data;
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+
+  const logout = async () => {
+    if (typeof window !== "undefined") {
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (refreshToken) {
+        try {
+          await api.post("/auth/logout", { refreshToken });
+        } catch {
+          // silent — we clear tokens regardless
+        }
+      }
+    }
+    clearTokens();
     setUser(null);
     setIsAuthenticated(false);
   };
@@ -94,41 +99,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const token = localStorage.getItem("access_token");
     if (!token) {
-      console.log("🔒 Aucun token trouvé, utilisateur non connecté");
       setLoading(false);
       return;
     }
 
     try {
-      console.log("🔄 Tentative de récupération de l'utilisateur...");
-      console.log("🔑 Token utilisé:", token.substring(0, 20) + "...");
-
-      const res = await api.get(`/auth/me`);
-      console.log("📦 Réponse /auth/me:", res.data);
-
-      // ✅ Adaptez selon la structure réelle de votre backend
-      // Essaie plusieurs structures possibles
-      const userData = res.data.data?.user || res.data.user || res.data;
+      const res = await api.get("/auth/me");
+      // New API: data.data is the user object directly
+      const userData: User = res.data.data;
 
       if (isMounted.current && userData) {
-        console.log("✅ Utilisateur récupéré avec succès:", userData);
         setUser(userData);
         setIsAuthenticated(true);
       } else {
-        console.warn("⚠️ Données utilisateur manquantes dans la réponse");
-        logout();
+        await logout();
       }
     } catch (error: any) {
-      console.error(
-        "❌ Erreur lors de la récupération de l'utilisateur:",
-        error,
-      );
-      console.error("❌ Détails de l'erreur:", error.response?.data);
-
-      // Si le token est invalide ou expiré, déconnexion automatique
-      if (error.response?.status === 401) {
-        console.warn("⚠️ Session expirée (401), déconnexion automatique");
-        if (isMounted.current) logout();
+      if (error.response?.status === 401 && isMounted.current) {
+        clearTokens();
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } finally {
       if (isMounted.current) setLoading(false);
@@ -136,26 +126,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log("🚀 AuthProvider monté - initialisation");
     isMounted.current = true;
-
-    // Log du token présent au démarrage
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
-      console.log("🔍 Token au démarrage:", token ? "Présent" : "Absent");
-    }
-
     refreshUser();
-
     return () => {
-      console.log("🛑 AuthProvider démonté");
       isMounted.current = false;
     };
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, loading, login, logout, refreshUser }}
+      value={{ user, isAuthenticated, loading, login, register, logout, refreshUser }}
     >
       {!loading ? (
         children

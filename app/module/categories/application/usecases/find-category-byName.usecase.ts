@@ -1,8 +1,7 @@
-import { ICategoryRepository } from "../../domain/interface/category.repository";
-
+// Route /categories/tendance/by-name supprimée dans la nouvelle API.
+// Utiliser directement l'API posts + filtrage côté client (voir FindByNameCat.tsx).
 export class FindCategoryByName {
-  constructor(private readonly cateRepo: ICategoryRepository) {}
-  async execute(catName: string) {
-    return await this.cateRepo.findName(catName);
+  async execute(_catName: string): Promise<never[]> {
+    return [];
   }
 }

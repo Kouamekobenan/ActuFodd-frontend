@@ -1,8 +1,7 @@
-import { ICategoryRepository } from "../../domain/interface/category.repository";
-
+// Route /categories/tendance supprimée dans la nouvelle API.
+// Utiliser /posts/trending à la place (voir CategoryTendance.tsx).
 export class FindCategoryTendanceUsecase {
-    constructor(private readonly categoryRepository: ICategoryRepository) {}
-    async execute() {
-        return await this.categoryRepository.findTendaces();
-    }
+  async execute(): Promise<never[]> {
+    return [];
+  }
 }

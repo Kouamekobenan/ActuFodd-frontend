@@ -1,4 +1,3 @@
-import { Categorie, Category } from "../../../categories/domain/entities/category.entity";
 import { MediaType } from "../enums/media-type";
 
 export class Post {
@@ -11,8 +10,13 @@ export class Post {
     public readonly categoryId: string | null,
     public readonly adminId: string,
     public readonly publishedAt: string,
-    public readonly updatedAt: Date,
+    public readonly updatedAt: string,
     public isPublished: boolean,
-    public category?: Categorie,
+    public views: number = 0,
+    public tags: string[] = [],
+    public likesCount: number = 0,
+    public commentsCount: number = 0,
+    public category?: { id: string; name: string },
+    public sourceUrl: string | null = null,
   ) {}
 }

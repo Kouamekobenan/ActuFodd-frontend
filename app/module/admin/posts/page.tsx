@@ -4,17 +4,17 @@ import CreatePostForm from "../components/PostForm";
 import { CreatePostDTO } from "../../post/application/dtos/create-post.dto";
 import { PostRepository } from "../../post/infrastructure/post.repository";
 import { CreatePostUseCase } from "../../post/application/usecases/create-post.usecase";
+import { Post } from "../../post/domain/entities/post";
 import BarLaterale from "../components/BarLaterale";
 
 const postRepository = new PostRepository();
 const createPostUseCase = new CreatePostUseCase(postRepository);
 
 export default function AdminPostsPage() {
-  const handleCreatePost = async (dto: CreatePostDTO, file: File | null) => {
+  const handleCreatePost = async (dto: CreatePostDTO, file: File | null): Promise<Post> => {
     try {
-      await createPostUseCase.execute(dto, file || undefined);
-      // console.log("Post créé avec succès dans le dashboard !");
-      alert("Post créé avec succès !");
+      const post = await createPostUseCase.execute(dto, file || undefined);
+      return post;
     } catch (error) {
       console.error("Erreur dashboard:", error);
       throw error;
