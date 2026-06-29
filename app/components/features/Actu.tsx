@@ -6,11 +6,15 @@ import { Post } from "../../module/post/domain/entities/post";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDate } from "../../lib/global/global";
+import { useTranslations, useLocale } from "next-intl";
+import { translateCategory } from "../../lib/categoryTranslations";
 
 const postRepo = new PostRepository();
 const findAllPostUseCase = new FindAllPostUseCase(postRepo);
 
 export default function NewInfo() {
+  const t = useTranslations("actu");
+  const locale = useLocale();
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -43,15 +47,14 @@ export default function NewInfo() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div className="space-y-2">
             <span className="text-orange-600 font-black uppercase tracking-[0.3em] text-[10px]">
-              Flux d'actualité
+              {t("badge")}
             </span>
             <h2 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">
-              Dernières <span className="text-orange-600">Publications</span>
+              {t("title")} <span className="text-orange-600">{t("titleHighlight")}</span>
             </h2>
           </div>
           <p className="text-gray-500 max-w-md text-sm font-light">
-            Explorez les dernières tendances, recettes et critiques
-            gastronomiques partagées par notre communauté.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -83,7 +86,7 @@ export default function NewInfo() {
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-gray-900 uppercase">
-                        {post.category?.name || "Général"}
+                        {post.category?.name ? translateCategory(post.category.name, locale) : t("general")}
                       </span>
                     </div>
                   </div>
@@ -101,7 +104,7 @@ export default function NewInfo() {
                     </p>
                     <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-widest text-gray-900">
-                        Lire plus
+                        {t("readMore")}
                       </span>
                       <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
                         →
@@ -113,7 +116,7 @@ export default function NewInfo() {
             ))
           ) : (
             <div className="col-span-full py-20 text-center text-gray-400 italic">
-              Aucun article pour le moment.
+              {t("noArticles")}
             </div>
           )}
         </div>

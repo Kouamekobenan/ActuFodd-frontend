@@ -7,11 +7,15 @@ import Link from "next/link";
 import { formatDate } from "../../lib/global/global";
 import { FindPostByTypeUseCase } from "../../module/post/application/usecases/find-post-byType.usecase";
 import { MediaType } from "../../module/post/domain/enums/media-type";
+import { useTranslations, useLocale } from "next-intl";
+import { translateCategory } from "../../lib/categoryTranslations";
 
 const postRepo = new PostRepository();
 const findAllPostUseCase = new FindPostByTypeUseCase(postRepo);
 
 export function Info() {
+  const t = useTranslations("home");
+  const locale = useLocale();
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeCategory, setActiveCategory] = useState("Tout");
@@ -35,25 +39,27 @@ export function Info() {
 
   const sliderPosts = useMemo(() => posts.slice(0, 3), [posts]);
 
+  const allLabel = t("all");
+
   const categories = useMemo(() => {
     const names = posts
       .map((p) => p.category?.name?.trim())
       .filter((name): name is string => !!name);
-    return ["Tout", ...Array.from(new Set(names))];
-  }, [posts]);
+    return [allLabel, ...Array.from(new Set(names))];
+  }, [posts, allLabel]);
 
   const filteredNews = useMemo(() => {
-    if (activeCategory === "Tout") return posts;
+    if (activeCategory === allLabel) return posts;
     return posts.filter((post) => post.category?.name?.trim() === activeCategory);
-  }, [posts, activeCategory]);
+  }, [posts, activeCategory, allLabel]);
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { Tout: posts.length };
+    const counts: Record<string, number> = { [allLabel]: posts.length };
     categories.slice(1).forEach((cat) => {
       counts[cat] = posts.filter((p) => p.category?.name?.trim() === cat).length;
     });
     return counts;
-  }, [posts, categories]);
+  }, [posts, categories, allLabel]);
 
   useEffect(() => {
     if (sliderPosts.length === 0) return;
@@ -71,7 +77,7 @@ export function Info() {
         <div className="text-center space-y-4">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-orange-600 border-t-transparent"></div>
           <p className="text-gray-600 font-medium tracking-wide">
-            Chargement de l'univers Foody...
+            {t("loading")}
           </p>
         </div>
       </div>
@@ -81,7 +87,7 @@ export function Info() {
   if (!posts.length) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-400 text-lg">Aucun contenu disponible</p>
+        <p className="text-gray-400 text-lg">{t("noContent")}</p>
       </div>
     );
   }
@@ -122,7 +128,7 @@ export function Info() {
                 >
                   {/* Badge */}
                   <span className="bg-orange-600 hover:bg-orange-700 transition-colors text-white px-5 py-2 text-[10px] font-black uppercase tracking-[0.3em] mb-6 inline-block rounded shadow-lg">
-                    À la une
+                    {t("featured")}
                   </span>
 
                   {/* Title */}
@@ -135,7 +141,7 @@ export function Info() {
                     <span>{formatDate(post.publishedAt)}</span>
                     <span className="w-10 h-[2px] bg-orange-500"></span>
                     <span className="text-orange-500 group-hover:translate-x-2 transition-transform inline-flex items-center gap-2">
-                      Lire le récit
+                      {t("readStory")}
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -179,13 +185,13 @@ export function Info() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-16 border-b-2 border-gray-200 pb-10">
           <div className="mb-8 lg:mb-0">
             <h2 className="text-3xl md:text-5xl font-black text-gray-900 uppercase tracking-tighter">
-              Journal{" "}
+              {t("journal")}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-500">
-                Gastronomique
+                {t("journalHighlight")}
               </span>
             </h2>
             <p className="text-gray-500 mt-3 text-sm md:text-base font-light tracking-wide">
-              Découvrez nos dernières histoires culinaires
+              {t("journalSubtitle")}
             </p>
           </div>
 
@@ -201,7 +207,7 @@ export function Info() {
                     : "text-gray-600 bg-white hover:bg-gray-100 hover:text-gray-900 border border-gray-200"
                 }`}
               >
-                {cat}
+                {translateCategory(cat, locale)}
                 {categoryCounts[cat] !== undefined && (
                   <span
                     className={`ml-2 text-[10px] px-2 py-0.5 rounded-full ${
@@ -238,7 +244,7 @@ export function Info() {
 
                     {/* Category badge on image */}
                     <span className="absolute top-4 left-4 bg-orange-600 text-white px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] rounded shadow-lg">
-                      {post.category?.name || "Magazine"}
+                      {post.category?.name ? translateCategory(post.category.name, locale) : t("magazine")}
                     </span>
                   </div>
 
@@ -279,7 +285,7 @@ export function Info() {
                     {/* Read more link */}
                     <div className="mt-auto pt-4 border-t border-gray-100">
                       <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-orange-600 transition-colors">
-                        Lire l'article
+                        {t("readArticle")}
                         <svg
                           className="w-4 h-4 group-hover:translate-x-1 transition-transform"
                           fill="none"
@@ -317,16 +323,16 @@ export function Info() {
                 />
               </svg>
               <p className="text-gray-400 italic text-xl font-light">
-                Aucune histoire à raconter dans cette rubrique pour le moment.
+                {t("emptyCategory")}
               </p>
               <p className="text-gray-500 text-sm">
-                Catégorie sélectionnée : <strong>{activeCategory}</strong>
+                {t("selectedCategory")} <strong>{translateCategory(activeCategory, locale)}</strong>
               </p>
               <button
-                onClick={() => setActiveCategory("Tout")}
+                onClick={() => setActiveCategory(allLabel)}
                 className="text-orange-600 hover:text-orange-700 text-sm font-semibold underline underline-offset-4"
               >
-                Voir tous les articles
+                {t("seeAll")}
               </button>
             </div>
           </div>

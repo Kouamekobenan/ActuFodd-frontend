@@ -3,20 +3,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
-
-const EXCERPT =
-  "Un média numérique ivoirien dédié à l'univers de la gastronomie sous toutes ses formes : cuisine, agriculture, innovation alimentaire, patrimoine culinaire et culture de l'assiette.";
-
-const FULL_TEXT =
-  "Né d'une passion pour les saveurs locales et une curiosité pour les tendances mondiales, actufoody.com raconte la nourriture comme on raconte une histoire — avec rigueur, respect et émotion. Nous donnons la parole aux cuisiniers de rue comme aux chefs étoilés, aux producteurs de fonio comme aux food-techs émergentes, aux chercheurs en nutrition comme aux activistes de la souveraineté alimentaire. Basé à Abidjan, actufoody.com s'adresse à une audience exigeante, curieuse et engagée en Côte d'Ivoire, en Afrique et dans la diaspora.";
-
-const STATS = [
-  { value: "10+", label: "Articles" },
-  { value: "5", label: "Catégories" },
-  { value: "Afrique & Moyen-Orient", label: "Audience" },
-];
+import { useTranslations } from "next-intl";
 
 export default function Presentation() {
+  const t = useTranslations("presentation");
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -34,7 +24,7 @@ export default function Presentation() {
             <div className="mb-6 flex items-center gap-3">
               <span className="h-px w-8 bg-orange-500" />
               <span className="text-[11px] font-black uppercase tracking-[0.25em] text-orange-600">
-                L'univers culinaire ivoirien
+                {t("badge")}
               </span>
             </div>
 
@@ -52,7 +42,7 @@ export default function Presentation() {
             {/* Excerpt + expand */}
             <div className="mb-6">
               <p className="text-base md:text-lg leading-relaxed text-gray-600">
-                {EXCERPT}
+                {t("excerpt")}
               </p>
               {/* Expanded text */}
               <div
@@ -61,7 +51,7 @@ export default function Presentation() {
                 }`}
               >
                 <p className="text-base md:text-lg leading-relaxed text-gray-600 border-l-4 border-orange-200 pl-4">
-                  {FULL_TEXT}
+                  {t("fullText")}
                 </p>
               </div>
 
@@ -72,12 +62,12 @@ export default function Presentation() {
               >
                 {expanded ? (
                   <>
-                    <ChevronUp className="w-4 h-4" /> Réduire
+                    <ChevronUp className="w-4 h-4" /> {t("collapse")}
                   </>
                 ) : (
                   <>
                     <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-                    Lire la suite
+                    {t("readMore")}
                   </>
                 )}
               </button>
@@ -97,13 +87,13 @@ export default function Presentation() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/module/categories/views/page">
                 <button className="group flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-7 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-orange-200 hover:shadow-orange-300 hover:scale-[1.02]">
-                  Découvrir les tendances
+                  {t("discoverTrends")}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
               <Link href="/module/recette">
                 <button className="flex items-center gap-2 border-2 border-gray-200 hover:border-gray-900 text-gray-700 hover:text-gray-900 px-7 py-3.5 rounded-xl font-bold text-sm transition-all hover:bg-gray-50">
-                  Nos recettes
+                  {t("ourRecipes")}
                 </button>
               </Link>
             </div>

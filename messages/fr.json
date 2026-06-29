@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "trends": "Tendances",
+    "portrait": "Portrait",
+    "recipes": "Recettes",
+    "videos": "Vidéos",
+    "restaurants": "Restau In",
+    "agenda": "Agenda",
+    "contact": "Contact"
+  },
+  "header": {
+    "tagline": "Le média culinaire ivoirien — Afrique & Moyen-Orient",
+    "location": "Abidjan, Côte d'Ivoire",
+    "dashboard": "Dashboard",
+    "dashboardAdmin": "Dashboard Admin",
+    "connectedAs": "Connecté en tant que",
+    "logout": "Se déconnecter",
+    "login": "Se connecter"
+  },
+  "footer": {
+    "newsletter": {
+      "badge": "Newsletter",
+      "title": "Restez connecté aux",
+      "titleHighlight": "saveurs du monde",
+      "subtitle": "Recevez chaque semaine nos meilleures recettes, découvertes culinaires et actualités gastronomiques directement dans votre boîte mail.",
+      "placeholder": "votre@email.com",
+      "subscribe": "S'abonner",
+      "privacy": "Vos données sont protégées. Désabonnement possible à tout moment."
+    },
+    "explore": "Explorer",
+    "info": "Informations",
+    "contact": "Contact",
+    "bio": "Le premier journal digital dédié à l'exploration culinaire et à l'actualité gastronomique. Découvrez les saveurs de demain, aujourd'hui.",
+    "links": {
+      "recipes": "Recettes",
+      "restaurants": "Restaurants",
+      "portraits": "Portraits & Rencontres",
+      "contactUs": "Contact",
+      "legalNotice": "Mentions Légales",
+      "privacy": "Politique de Confidentialité"
+    },
+    "copyright": "© {year} ACTUFOODY — TOUS DROITS RÉSERVÉS",
+    "legal": "Mentions Légales",
+    "confidentiality": "Confidentialité"
+  },
+  "home": {
+    "loading": "Chargement de l'univers Foody...",
+    "noContent": "Aucun contenu disponible",
+    "featured": "À la une",
+    "readStory": "Lire le récit",
+    "journal": "Journal",
+    "journalHighlight": "Gastronomique",
+    "journalSubtitle": "Découvrez nos dernières histoires culinaires",
+    "all": "Tout",
+    "emptyCategory": "Aucune histoire à raconter dans cette rubrique pour le moment.",
+    "selectedCategory": "Catégorie sélectionnée :",
+    "seeAll": "Voir tous les articles",
+    "readArticle": "Lire l'article",
+    "magazine": "Magazine"
+  },
+  "actu": {
+    "badge": "Flux d'actualité",
+    "title": "Dernières",
+    "titleHighlight": "Publications",
+    "subtitle": "Explorez les dernières tendances, recettes et critiques gastronomiques partagées par notre communauté.",
+    "readMore": "Lire plus",
+    "general": "Général",
+    "noArticles": "Aucun article pour le moment."
+  },
+  "presentation": {
+    "badge": "L'univers culinaire ivoirien",
+    "excerpt": "Un média numérique ivoirien dédié à l'univers de la gastronomie sous toutes ses formes : cuisine, agriculture, innovation alimentaire, patrimoine culinaire et culture de l'assiette.",
+    "fullText": "Né d'une passion pour les saveurs locales et une curiosité pour les tendances mondiales, actufoody.com raconte la nourriture comme on raconte une histoire — avec rigueur, respect et émotion. Nous donnons la parole aux cuisiniers de rue comme aux chefs étoilés, aux producteurs de fonio comme aux food-techs émergentes, aux chercheurs en nutrition comme aux activistes de la souveraineté alimentaire. Basé à Abidjan, actufoody.com s'adresse à une audience exigeante, curieuse et engagée en Côte d'Ivoire, en Afrique et dans la diaspora.",
+    "collapse": "Réduire",
+    "readMore": "Lire la suite",
+    "discoverTrends": "Découvrir les tendances",
+    "ourRecipes": "Nos recettes"
+  }
+}

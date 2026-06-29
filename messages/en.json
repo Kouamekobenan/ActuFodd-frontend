@@ -1,0 +1,80 @@
+{
+  "nav": {
+    "home": "Home",
+    "trends": "Trends",
+    "portrait": "Portrait",
+    "recipes": "Recipes",
+    "videos": "Videos",
+    "restaurants": "Restaurants",
+    "agenda": "Agenda",
+    "contact": "Contact"
+  },
+  "header": {
+    "tagline": "Ivorian culinary media — Africa & Middle East",
+    "location": "Abidjan, Côte d'Ivoire",
+    "dashboard": "Dashboard",
+    "dashboardAdmin": "Admin Dashboard",
+    "connectedAs": "Logged in as",
+    "logout": "Log out",
+    "login": "Log in"
+  },
+  "footer": {
+    "newsletter": {
+      "badge": "Newsletter",
+      "title": "Stay connected to the",
+      "titleHighlight": "flavors of the world",
+      "subtitle": "Receive our best recipes, culinary discoveries and gastronomic news directly in your inbox every week.",
+      "placeholder": "your@email.com",
+      "subscribe": "Subscribe",
+      "privacy": "Your data is protected. Unsubscribe at any time."
+    },
+    "explore": "Explore",
+    "info": "Information",
+    "contact": "Contact",
+    "bio": "The first digital journal dedicated to culinary exploration and gastronomic news. Discover the flavors of tomorrow, today.",
+    "links": {
+      "recipes": "Recipes",
+      "restaurants": "Restaurants",
+      "portraits": "Portraits & Encounters",
+      "contactUs": "Contact",
+      "legalNotice": "Legal Notice",
+      "privacy": "Privacy Policy"
+    },
+    "copyright": "© {year} ACTUFOODY — ALL RIGHTS RESERVED",
+    "legal": "Legal Notice",
+    "confidentiality": "Privacy"
+  },
+  "home": {
+    "loading": "Loading the Foody universe...",
+    "noContent": "No content available",
+    "featured": "Featured",
+    "readStory": "Read the story",
+    "journal": "Gastronomic",
+    "journalHighlight": "Journal",
+    "journalSubtitle": "Discover our latest culinary stories",
+    "all": "All",
+    "emptyCategory": "No stories to tell in this section yet.",
+    "selectedCategory": "Selected category:",
+    "seeAll": "See all articles",
+    "readArticle": "Read article",
+    "magazine": "Magazine"
+  },
+  "actu": {
+    "badge": "News feed",
+    "title": "Latest",
+    "titleHighlight": "Publications",
+    "subtitle": "Explore the latest trends, recipes and gastronomic reviews shared by our community.",
+    "readMore": "Read more",
+    "general": "General",
+    "noArticles": "No articles at the moment."
+  },
+  "presentation": {
+    "badge": "The Ivorian culinary universe",
+    "excerpt": "An Ivorian digital media dedicated to the gastronomic universe in all its forms: cooking, agriculture, food innovation, culinary heritage and food culture.",
+    "fullText": "Born from a passion for local flavors and a curiosity for global trends, actufoody.com tells food like a story — with rigor, respect and emotion. We give voice to street cooks as well as starred chefs, to fonio producers as well as emerging food-techs, to nutrition researchers as well as food sovereignty activists. Based in Abidjan, actufoody.com addresses a demanding, curious and engaged audience in Côte d'Ivoire, Africa and the diaspora.",
+    "collapse": "Collapse",
+    "readMore": "Read more",
+    "discoverTrends": "Discover trends",
+    "ourRecipes": "Our recipes"
+  }
+}
