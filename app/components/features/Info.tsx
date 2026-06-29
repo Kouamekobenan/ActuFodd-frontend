@@ -11,14 +11,6 @@ import { MediaType } from "../../module/post/domain/enums/media-type";
 const postRepo = new PostRepository();
 const findAllPostUseCase = new FindPostByTypeUseCase(postRepo);
 
-const CATEGORIES = [
-  "Tout",
-  "Tendance",
-  "Recettes",
-  "Restaurant",
-  "Portrait & Rencontre",
-];
-
 export function Info() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,14 +22,6 @@ export function Info() {
       setIsLoading(true);
       const response = await findAllPostUseCase.execute(MediaType.IMAGE, 12, 1);
       setPosts(response.data);
-
-      // Debug: Log all unique categories found in posts
-      const uniqueCategories = [
-        ...new Set(
-          response.data.map((post) => post.category?.name).filter(Boolean),
-        ),
-      ];
-      console.log("📋 Catégories trouvées dans les posts:", uniqueCategories);
     } catch (error) {
       console.error("❌ Erreur lors du chargement des posts:", error);
     } finally {
@@ -51,55 +35,25 @@ export function Info() {
 
   const sliderPosts = useMemo(() => posts.slice(0, 3), [posts]);
 
+  const categories = useMemo(() => {
+    const names = posts
+      .map((p) => p.category?.name?.trim())
+      .filter((name): name is string => !!name);
+    return ["Tout", ...Array.from(new Set(names))];
+  }, [posts]);
+
   const filteredNews = useMemo(() => {
-    const news = posts.slice();
-
-    if (activeCategory === "Tout") {
-      console.log(`✅ Affichage de tous les articles (${news.length})`);
-      return news;
-    }
-
-    // Normalize function to handle special characters and spaces
-    const normalize = (str: string) =>
-      str.trim().toLowerCase().replace(/\s+/g, " ");
-
-    const normalizedActiveCategory = normalize(activeCategory);
-
-    const filtered = news.filter((post) => {
-      const categoryName = post.category?.name || "";
-      const normalizedCategoryName = normalize(categoryName);
-
-      return normalizedCategoryName === normalizedActiveCategory;
-    });
-
-    console.log(`🔍 Filtrage pour "${activeCategory}":`, {
-      totalPosts: news.length,
-      filteredCount: filtered.length,
-      postsInCategory: filtered.map((p) => ({
-        title: p.title,
-        category: p.category?.name,
-      })),
-    });
-
-    return filtered;
+    if (activeCategory === "Tout") return posts;
+    return posts.filter((post) => post.category?.name?.trim() === activeCategory);
   }, [posts, activeCategory]);
 
-  // Get category counts for display
   const categoryCounts = useMemo(() => {
-    const allNews = posts.slice();
-    const counts: Record<string, number> = { Tout: allNews.length };
-
-    CATEGORIES.slice(1).forEach((cat) => {
-      const normalize = (str: string) =>
-        str.trim().toLowerCase().replace(/\s+/g, " ");
-      const count = allNews.filter(
-        (post) => normalize(post.category?.name || "") === normalize(cat),
-      ).length;
-      counts[cat] = count;
+    const counts: Record<string, number> = { Tout: posts.length };
+    categories.slice(1).forEach((cat) => {
+      counts[cat] = posts.filter((p) => p.category?.name?.trim() === cat).length;
     });
-
     return counts;
-  }, [posts]);
+  }, [posts, categories]);
 
   useEffect(() => {
     if (sliderPosts.length === 0) return;
@@ -237,7 +191,7 @@ export function Info() {
 
           {/* Category filters with counts */}
           <nav className="flex flex-wrap gap-3">
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}

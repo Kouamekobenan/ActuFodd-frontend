@@ -6,7 +6,6 @@ import { TrendingUp, Calendar, AlertCircle, Loader2 } from "lucide-react";
 import { api } from "../../../../common/database/api";
 import { formatDate } from "../../../../lib/global/global";
 import { Post } from "../../../post/domain/entities/post";
-
 const PostCard = ({ post }: { post: Post }) => (
   <article className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
     <div className="relative h-56 w-full overflow-hidden bg-gray-100">
@@ -74,7 +73,6 @@ export default function CategoryTendance() {
   useEffect(() => {
     fetchTrending();
   }, [fetchTrending]);
-
   return (
     <section className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -89,14 +87,12 @@ export default function CategoryTendance() {
             Les articles les plus consultés du moment
           </p>
         </header>
-
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-12 h-12 text-orange-600 animate-spin mb-4" />
             <p className="text-gray-600 text-lg">Chargement des tendances...</p>
           </div>
         )}
-
         {error && !isLoading && (
           <div className="flex flex-col items-center justify-center py-20 px-4">
             <div className="bg-red-50 rounded-full p-4 mb-4">
