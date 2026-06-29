@@ -23,11 +23,11 @@ const PostCard = ({ post }: { post: Post }) => (
           <TrendingUp className="w-10 h-10 text-gray-300" />
         </div>
       )}
-      {post.views > 0 && (
+      {/* {post.views > 0 && (
         <span className="absolute top-3 right-3 bg-black/60 text-white text-xs font-bold px-2 py-1 rounded-full">
           {post.views} vues
         </span>
-      )}
+      )} */}
     </div>
     <div className="p-6">
       {post.category && (
@@ -128,7 +128,6 @@ export default function CategoryTendance() {
             </p>
           </div>
         )}
-
         {!isLoading && !error && posts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (

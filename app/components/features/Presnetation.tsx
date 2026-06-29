@@ -83,7 +83,7 @@ export default function Presentation() {
               </button>
             </div>
             {/* Stats row */}
-            <div className="mb-8 flex items-center gap-6 md:gap-8 py-5 border-y border-gray-100">
+            {/* <div className="mb-8 flex items-center gap-6 md:gap-8 py-5 border-y border-gray-100">
               {STATS.map((s, i) => (
                 <div key={i} className="text-center">
                   <p className="text-xl md:text-2xl font-black text-gray-900">{s.value}</p>
@@ -92,7 +92,7 @@ export default function Presentation() {
                   </p>
                 </div>
               ))}
-            </div>
+            </div> */}
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/module/categories/views/page">
@@ -122,13 +122,13 @@ export default function Presentation() {
                 fill
                 className="object-cover transition-transform duration-700 hover:scale-105"
                 priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 80vw, 50vw"
               />
               {/* Gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
               {/* Floating tag bottom-left */}
-              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
+              {/* <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-lg">
                   <p className="text-[10px] uppercase tracking-widest text-orange-600 font-black mb-0.5">
                     Média culinaire
@@ -139,7 +139,7 @@ export default function Presentation() {
                   <p className="text-xs font-black text-white/80 uppercase tracking-wide">Depuis</p>
                   <p className="text-lg font-black text-white leading-none">2025</p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 

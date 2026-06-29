@@ -15,7 +15,7 @@ export default function NewInfo() {
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const PAGE_LIMIT = 6; // On réduit un peu pour une pagination plus visible
+  const PAGE_LIMIT = 2; // On réduit un peu pour une pagination plus visible
 
   const fetchPostData = useCallback(async () => {
     setIsLoading(true);

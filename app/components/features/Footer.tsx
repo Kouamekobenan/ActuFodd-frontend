@@ -127,8 +127,7 @@ export default function Footer() {
               </button>
             </form>
             <p className="text-gray-600 text-xs mt-4">
-              🔒 Vos données sont protégées. Désabonnement possible à tout
-              moment.
+              Vos données sont protégées. Désabonnement possible à tout moment.
             </p>
           </div>
         </div>
@@ -138,19 +137,21 @@ export default function Footer() {
             {/* Section Logo & Bio */}
             <div className="lg:col-span-1 space-y-6">
               <a href="/page" className="inline-block group">
-                <h2 className="text-3xl sm:text-4xl font-black tracking-tighter uppercase">
+                <h3 className="mb-6 font-serif text-5xl md:text-6xl lg:text-7xl leading-[0.95] text-gray-500">
                   Actu
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600 group-hover:from-orange-400 group-hover:to-orange-500 transition-all">
-                    Foody
+                  <span className="relative inline-block text-orange-500">
+                    foody
+                    {/* underline decoration */}
+                    <span className="absolute -bottom-1 left-0 h-1 w-full bg-orange-200 rounded-full" />
                   </span>
-                </h2>
+                  {/* <span className="text-gray-400">.com</span> */}
+                </h3>
               </a>
               <p className="text-gray-400 text-sm font-light leading-relaxed max-w-xs">
                 Le premier journal digital dédié à l'exploration culinaire et à
                 l'actualité gastronomique. Découvrez les saveurs de demain,
                 aujourd'hui.
               </p>
-
               {/* Réseaux Sociaux */}
               <div className="flex gap-3 pt-2">
                 {footerNavigation.social.map((item) => (
@@ -207,7 +208,6 @@ export default function Footer() {
                 ))}
               </ul>
             </div>
-
             {/* Contact Info */}
             <div>
               <Link href="/module/contact">

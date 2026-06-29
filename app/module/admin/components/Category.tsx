@@ -136,7 +136,6 @@ export default function AdminCategories() {
             />
           </div>
         </div>
-
         {/* Categories Grid */}
         {filteredCategories.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 text-center">
